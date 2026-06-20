@@ -106,7 +106,14 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
     // 2: Monumental Arches / Portals (like image 3)
     const theme = Math.floor(random() * 3);
 
-    const shuffledColors = [...colors].sort(() => random() - 0.5);
+    // Stable Fisher-Yates shuffle using our deterministic pseudo-random generator
+    const shuffledColors = [...colors];
+    for (let i = shuffledColors.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      const temp = shuffledColors[i];
+      shuffledColors[i] = shuffledColors[j];
+      shuffledColors[j] = temp;
+    }
 
     if (theme === 0) {
       // THEME 0: SWEEPING WAVES & DUNES

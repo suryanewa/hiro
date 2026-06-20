@@ -108,7 +108,6 @@ body {
   font-weight: 500;
   color: var(--text-muted);
   margin-bottom: 12px;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 

@@ -10,7 +10,7 @@ import {
 
 const SHADER_COMPONENTS = {
   'paper-texture': { Component: PaperTexture, presets: paperTexturePresets.filter(p => p.name !== 'Cardboard' && p.name !== 'Details') },
-  'fluted-glass': { Component: FlutedGlass, presets: flutedGlassPresets },
+  'fluted-glass': { Component: FlutedGlass, presets: flutedGlassPresets.filter(p => p.name !== 'Abstract' && p.name !== 'Folds') },
   'water': { Component: Water, presets: waterPresets },
   'image-dithering': { Component: ImageDithering, presets: imageDitheringPresets.filter(p => p.name !== 'Default' && p.name !== 'Noise') },
   'halftone-dots': { Component: HalftoneDots, presets: halftoneDotsPresets.filter(p => p.name !== 'Default' && p.name !== 'LED screen' && p.name !== 'Round and square') },
@@ -39,10 +39,7 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
   // For all water presets besides slow-mo, and all fluted glass presets, scale up/zoom in to hide distortion edges
   const isWaterOverlay = shaderType === 'water' && presetName !== 'Slow-mo';
   const isFlutedGlass = shaderType === 'fluted-glass';
-  let shaderScale = 1;
-  if (isWaterOverlay || isFlutedGlass) {
-    shaderScale = (shaderType === 'fluted-glass' && presetName === 'Folds') ? 1.5625 : 1.25;
-  }
+  const shaderScale = (isWaterOverlay || isFlutedGlass) ? 1.25 : 1;
 
   // Visual scaling logic (matches GradientCanvas)
   const renderScale = Math.min(1, 800 / Math.max(width, height));

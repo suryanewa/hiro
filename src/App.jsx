@@ -32,7 +32,7 @@ const BLEND_MODES = [
 
 const SHADER_PRESETS = {
   'paper-texture': paperTexturePresets.filter(p => p.name !== 'Cardboard' && p.name !== 'Details'),
-  'fluted-glass': flutedGlassPresets,
+  'fluted-glass': flutedGlassPresets.filter(p => p.name !== 'Abstract' && p.name !== 'Folds'),
   'water': waterPresets,
   'image-dithering': imageDitheringPresets.filter(p => p.name !== 'Default' && p.name !== 'Noise'),
   'halftone-dots': halftoneDotsPresets.filter(p => p.name !== 'Default' && p.name !== 'LED screen' && p.name !== 'Round and square'),

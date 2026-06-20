@@ -72,7 +72,7 @@ function App() {
   };
 
   const addColor = () => {
-    if (colors.length < 4) {
+    if (colors.length < 6) {
       setColors([...colors, '#ffffff']);
     }
   };
@@ -152,11 +152,14 @@ function App() {
         <div className="control-group">
           <div className="control-header">
             <label className="control-label">Brand Colors</label>
-            {colors.length < 4 && (
-              <button onClick={addColor} className="btn-icon-add" title="Add Color">
-                <Plus size={16} />
-              </button>
-            )}
+            <button 
+              onClick={addColor} 
+              className="btn-icon-add" 
+              title="Add Color"
+              disabled={colors.length >= 6}
+            >
+              <Plus size={16} />
+            </button>
           </div>
           <div className="color-list">
             {colors.map((c, i) => (

@@ -137,6 +137,12 @@ body {
   color: var(--text-main);
   background-color: rgba(255, 255, 255, 0.1);
 }
+.btn-icon-add:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background-color: transparent;
+  color: var(--text-muted);
+}
 
 /* Color Pickers */
 .color-list {

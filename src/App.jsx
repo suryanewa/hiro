@@ -10,6 +10,7 @@ import {
   halftoneDotsPresets, 
   halftoneCmykPresets 
 } from '@paper-design/shaders-react';
+import { rybHsl2rgb } from 'rybitten';
 
 const DEFAULT_COLORS = ['#0f172a', '#3b82f6', '#8b5cf6', '#000000'];
 
@@ -39,15 +40,9 @@ const SHADER_PRESETS = {
   'halftone-cmyk': halftoneCmykPresets.filter(p => p.name !== 'Newspaper' && p.name !== 'Drops')
 };
 
-const hslToHex = (h, s, l) => {
-  l /= 100;
-  const a = s * Math.min(l, 1 - l) / 100;
-  const f = n => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color).toString(16).padStart(2, '0');
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
+const rgbToHex = (r, g, b) => {
+  const f = x => Math.round(x * 255).toString(16).padStart(2, '0');
+  return `#${f(r)}${f(g)}${f(b)}`;
 };
 
 const generateHarmonicPalette = (count) => {
@@ -85,7 +80,8 @@ const generateHarmonicPalette = (count) => {
     }
     
     if (h < 0) h += 360;
-    newColors.push(hslToHex(h, s, l));
+    const rgb = rybHsl2rgb([h, s / 100, l / 100]);
+    newColors.push(rgbToHex(rgb[0], rgb[1], rgb[2]));
   }
   return newColors;
 };

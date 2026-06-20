@@ -36,9 +36,10 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
   const { Component, presets } = shaderConfig;
   const preset = presets.find(p => p.name === presetName) || presets[0];
 
-  // For all water presets besides slow-mo, scale up/zoom in to hide distortion edges
+  // For all water presets besides slow-mo, and all fluted glass presets, scale up/zoom in to hide distortion edges
   const isWaterOverlay = shaderType === 'water' && presetName !== 'Slow-mo';
-  const shaderScale = isWaterOverlay ? 1.25 : 1;
+  const isFlutedGlass = shaderType === 'fluted-glass';
+  const shaderScale = (isWaterOverlay || isFlutedGlass) ? 1.25 : 1;
 
   // Visual scaling logic (matches GradientCanvas)
   const renderScale = Math.min(1, 800 / Math.max(width, height));

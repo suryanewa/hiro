@@ -205,6 +205,27 @@ function App() {
         </div>
 
         <div className="control-group">
+          <div className="slider-header">
+            <label className="control-label" style={{ marginBottom: 0 }}>Blur Strength</label>
+            <span className="slider-value">{blurStrength}%</span>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            value={blurStrength} 
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              setBlurStrength(val);
+              if (val > 0) {
+                setIsBlurred(true);
+              }
+            }}
+            className="range-input"
+          />
+        </div>
+
+        <div className="control-group">
           <label className="control-label">Blend Mode</label>
           <select 
             value={blendMode} 
@@ -248,27 +269,6 @@ function App() {
               ))}
             </div>
           )}
-        </div>
-
-        <div className="control-group">
-          <div className="slider-header">
-            <label className="control-label" style={{ marginBottom: 0 }}>Blur Strength</label>
-            <span className="slider-value">{blurStrength}%</span>
-          </div>
-          <input 
-            type="range" 
-            min="0" 
-            max="100" 
-            value={blurStrength} 
-            onChange={(e) => {
-              const val = parseInt(e.target.value, 10);
-              setBlurStrength(val);
-              if (val > 0) {
-                setIsBlurred(true);
-              }
-            }}
-            className="range-input"
-          />
         </div>
 
         <div className="control-group" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>

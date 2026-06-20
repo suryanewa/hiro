@@ -36,6 +36,14 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
   const { Component, presets } = shaderConfig;
   const preset = presets.find(p => p.name === presetName) || presets[0];
 
+  // Clone preset params to avoid mutating original imported objects
+  const presetParams = { ...(preset?.params || {}) };
+
+  // For the default fluted glass preset, make the bands wider (increase size to 1.0)
+  if (shaderType === 'fluted-glass' && preset.name === 'Default') {
+    presetParams.size = 1.0;
+  }
+
   // For all water presets besides slow-mo, and all fluted glass presets, scale up/zoom in to hide distortion edges
   const isWaterOverlay = shaderType === 'water' && presetName !== 'Slow-mo';
   const isFlutedGlass = shaderType === 'fluted-glass';
@@ -69,7 +77,7 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
             image={imageUrl}
             width={width}
             height={height}
-            {...(preset?.params || {})}
+            {...presetParams}
             fit="cover"
             scale={shaderScale}
             style={{ width: '100%', height: '100%', display: 'block' }}

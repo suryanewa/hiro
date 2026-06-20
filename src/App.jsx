@@ -47,60 +47,85 @@ const rgbToHex = (r, g, b) => {
 
 const generateHarmonicPalette = (count, vibrancy = 'vibrant') => {
   const baseHue = Math.floor(Math.random() * 360);
-  const scheme = Math.floor(Math.random() * 4); // 0: Analogous, 1: Triadic, 2: Split Complementary, 3: Monochromatic
+  const baseSat = 65 + Math.floor(Math.random() * 25); // 65-90% base saturation
+  const baseLight = 40 + Math.floor(Math.random() * 25); // 40-65% base lightness
   
   const newColors = [];
+  
+  let scheme;
+  if (vibrancy === 'subtle') {
+    // Monochromatic or very close Analogous
+    scheme = Math.random() > 0.5 ? 'mono' : 'close-analogous';
+  } else if (vibrancy === 'normal') {
+    const schemes = ['analogous', 'triadic', 'split', 'mono'];
+    scheme = schemes[Math.floor(Math.random() * schemes.length)];
+  } else {
+    // Vibrant gets high-contrast schemes
+    const schemes = ['triadic', 'split', 'complementary'];
+    scheme = schemes[Math.floor(Math.random() * schemes.length)];
+  }
+
   for (let i = 0; i < count; i++) {
     let h, s, l;
-    
-    if (vibrancy === 'subtle') {
-      s = 10 + Math.random() * 20; // 10-30% (desaturated/muted)
-      l = 25 + Math.random() * 55; // 25-80% (broad lightness range: light to dark)
-    } else if (vibrancy === 'normal') {
-      s = 45 + Math.random() * 25; // 45-70%
-      l = 40 + Math.random() * 30; // 40-70%
-    } else {
-      // vibrant
-      s = 85 + Math.random() * 15; // 85-100%
-      l = 35 + Math.random() * 20; // 35-55%
-    }
-    
-    // Introduce an occasional dark or very light accent color for contrast
-    if (i === count - 1 && Math.random() > 0.5) {
-       if (vibrancy === 'subtle') {
-         l = Math.random() > 0.5 ? 15 + Math.random() * 15 : 75 + Math.random() * 15;
-         s = 10 + Math.random() * 15;
-       } else if (vibrancy === 'normal') {
-         l = Math.random() > 0.5 ? 20 + Math.random() * 10 : 80 + Math.random() * 10;
-         s = 50 + Math.random() * 20;
-       } else {
-         l = Math.random() > 0.5 ? 10 + Math.random() * 10 : 90 + Math.random() * 8;
-         s = 85 + Math.random() * 15;
-       }
-    }
 
-    if (scheme === 0) {
-      h = (baseHue + (i * 30) + (Math.random() * 10 - 5)) % 360;
-    } else if (scheme === 1) {
-      h = (baseHue + (i * 120)) % 360;
-      if (i >= 3) h = (h + 30) % 360; 
-      h = (h + (Math.random() * 10 - 5)) % 360;
-    } else if (scheme === 2) {
-      if (i === 0) h = baseHue;
-      else if (i % 2 === 1) h = (baseHue + 150) % 360;
-      else h = (baseHue + 210) % 360;
-      h = (h + (Math.random() * 20 - 10)) % 360;
-    } else {
-      h = (baseHue + (Math.random() * 20 - 10)) % 360;
-      if (vibrancy === 'subtle') {
-        s = Math.max(8, s - (i * 2));
-        l = l > 50 ? Math.max(30, l - (i * 6)) : Math.min(80, l + (i * 6));
-      } else if (vibrancy === 'normal') {
-        s = Math.max(25, s - (i * 4));
-        l = l > 50 ? Math.max(25, l - (i * 8)) : Math.min(85, l + (i * 8));
+    if (vibrancy === 'subtle') {
+      if (scheme === 'mono') {
+        h = (baseHue + (Math.random() * 6 - 3)) % 360;
+        s = Math.max(30, Math.min(100, baseSat + (Math.random() * 8 - 4)));
+        l = Math.max(20, Math.min(90, baseLight + (i * 6 - (count * 3))));
       } else {
-        s = Math.max(45, s - (i * 4));
-        l = l > 50 ? Math.max(20, l - (i * 10)) : Math.min(90, l + (i * 10));
+        h = (baseHue + (i * (6 + Math.random() * 6))) % 360; // 6-12 degree shift per color
+        s = Math.max(30, Math.min(100, baseSat + (Math.random() * 8 - 4)));
+        l = Math.max(20, Math.min(90, baseLight + (Math.random() * 8 - 4)));
+      }
+    } else if (vibrancy === 'normal') {
+      s = 50 + Math.random() * 35; // 50-85%
+      l = 40 + Math.random() * 30; // 40-70%
+      
+      if (scheme === 'mono') {
+        h = (baseHue + (Math.random() * 12 - 6)) % 360;
+        s = Math.max(30, s - (i * 4));
+        l = Math.max(25, Math.min(85, l + (i * 8) - 12));
+      } else if (scheme === 'analogous') {
+        h = (baseHue + (i * 25) + (Math.random() * 10 - 5)) % 360;
+      } else if (scheme === 'triadic') {
+        h = (baseHue + (i * 120)) % 360;
+        if (i >= 3) h = (h + 30) % 360;
+      } else {
+        if (i === 0) h = baseHue;
+        else if (i % 2 === 1) h = (baseHue + 150) % 360;
+        else h = (baseHue + 210) % 360;
+      }
+
+      if (i === count - 1 && Math.random() > 0.5) {
+         l = Math.random() > 0.5 ? 20 + Math.random() * 10 : 80 + Math.random() * 10;
+      }
+    } else {
+      s = 85 + Math.random() * 15; // 85-100%
+      l = 35 + Math.random() * 25; // 35-60%
+      
+      if (scheme === 'complementary') {
+        h = (i % 2 === 0) ? baseHue : (baseHue + 180) % 360;
+        h = (h + (Math.random() * 16 - 8)) % 360;
+      } else if (scheme === 'triadic') {
+        h = (baseHue + (i * 120) + (Math.random() * 10 - 5)) % 360;
+      } else {
+        if (i === 0) h = baseHue;
+        else if (i % 2 === 1) h = (baseHue + 140) % 360;
+        else h = (baseHue + 220) % 360;
+        h = (h + (Math.random() * 20 - 10)) % 360;
+      }
+      
+      // Dynamic contrast for vibrant
+      if (i % 2 === 1) {
+        l = Math.max(15, l - 15);
+      } else {
+        l = Math.min(85, l + 15);
+      }
+      
+      if (i === count - 1) {
+         l = Math.random() > 0.5 ? 10 + Math.random() * 10 : 90 + Math.random() * 8;
+         s = 90 + Math.random() * 10;
       }
     }
     

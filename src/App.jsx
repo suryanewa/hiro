@@ -186,25 +186,6 @@ function App() {
         </div>
 
         <div className="control-group">
-          <label className="control-label">Aspect Ratio</label>
-          <div className="aspect-ratios">
-            {RATIOS.map((ratio) => {
-              const Icon = ratio.icon;
-              return (
-                <button
-                  key={ratio.label}
-                  className={`ratio-btn ${activeRatio.label === ratio.label ? 'active' : ''}`}
-                  onClick={() => setActiveRatio(ratio)}
-                >
-                  <Icon size={18} strokeWidth={2} />
-                  {ratio.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="control-group">
           <div className="slider-header">
             <label className="control-label" style={{ marginBottom: 0 }}>Blur Strength</label>
             <span className="slider-value">{blurStrength}%</span>
@@ -271,7 +252,26 @@ function App() {
           )}
         </div>
 
-        <div className="control-group" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="control-group" style={{ marginTop: 'auto' }}>
+          <label className="control-label">Aspect Ratio</label>
+          <div className="aspect-ratios">
+            {RATIOS.map((ratio) => {
+              const Icon = ratio.icon;
+              return (
+                <button
+                  key={ratio.label}
+                  className={`ratio-btn ${activeRatio.label === ratio.label ? 'active' : ''}`}
+                  onClick={() => setActiveRatio(ratio)}
+                >
+                  <Icon size={18} strokeWidth={2} />
+                  {ratio.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="control-group" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           <button className="btn-secondary" onClick={randomize}>
             <RefreshCw size={18} />

@@ -231,7 +231,7 @@ function App() {
             <option value="halftone-cmyk">Halftone CMYK</option>
           </select>
 
-          {activeShader !== 'none' && SHADER_PRESETS[activeShader] && (
+          {activeShader !== 'none' && SHADER_PRESETS[activeShader] && SHADER_PRESETS[activeShader].length > 1 && (
             <div className="preset-grid">
               {SHADER_PRESETS[activeShader].map((preset) => (
                 <button

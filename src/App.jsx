@@ -280,7 +280,7 @@ function App() {
           
           <button className="btn-primary" onClick={handleExport}>
             <Download size={18} />
-            Export Image
+            Export
           </button>
         </div>
       </div>

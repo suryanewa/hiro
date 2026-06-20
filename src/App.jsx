@@ -269,7 +269,11 @@ function App() {
           <label className="control-label">Vibrancy</label>
           <select 
             value={vibrancy} 
-            onChange={(e) => setVibrancy(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setVibrancy(val);
+              setColors(prevColors => generateHarmonicPalette(prevColors.length, val));
+            }}
             className="select-input"
           >
             <option value="subtle">Subtle</option>

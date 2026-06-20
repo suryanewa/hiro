@@ -36,6 +36,10 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
   const { Component, presets } = shaderConfig;
   const preset = presets.find(p => p.name === presetName) || presets[0];
 
+  // For all water presets besides slow-mo, scale up/zoom in to hide distortion edges
+  const isWaterOverlay = shaderType === 'water' && presetName !== 'Slow-mo';
+  const shaderScale = isWaterOverlay ? 1.25 : 1;
+
   // Visual scaling logic (matches GradientCanvas)
   const renderScale = Math.min(1, 800 / Math.max(width, height));
 
@@ -66,7 +70,7 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
             height={height}
             {...(preset?.params || {})}
             fit="cover"
-            scale={1}
+            scale={shaderScale}
             style={{ width: '100%', height: '100%', display: 'block' }}
           />
         </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 
-const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity = 0.1, isBlurred = true, blurStrength = 100, blendMode = 'dynamic' }, ref) => {
+const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity = 0.1, isBlurred = true, blurStrength = 100, blendMode = 'dynamic', onRender }, ref) => {
   const canvasRef = useRef(null);
 
   // Expose export function to parent
@@ -244,7 +244,10 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
     // Reset composite operation
     ctx.globalCompositeOperation = 'source-over';
 
-  }, [colors, width, height, seed, glassIntensity, isBlurred, blurStrength, blendMode]);
+    if (onRender) {
+      onRender(canvas.toDataURL('image/png'));
+    }
+  }, [colors, width, height, seed, glassIntensity, isBlurred, blurStrength, blendMode, onRender]);
 
   // Visual scaling logic so it fits the screen without changing actual export resolution
   const renderScale = Math.min(1, 800 / Math.max(width, height));

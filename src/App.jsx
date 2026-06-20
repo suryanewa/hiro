@@ -1,6 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Download, RefreshCw, Plus, Trash2, Monitor, Smartphone, Square, Layout, Eye, EyeOff } from 'lucide-react';
 import GradientCanvas from './GradientCanvas';
+import ShaderPreview from './ShaderPreview';
+import { 
+  paperTexturePresets, 
+  flutedGlassPresets, 
+  waterPresets, 
+  imageDitheringPresets, 
+  halftoneDotsPresets, 
+  halftoneCmykPresets 
+} from '@paper-design/shaders-react';
 
 const DEFAULT_COLORS = ['#0f172a', '#3b82f6', '#8b5cf6', '#000000'];
 
@@ -21,6 +30,15 @@ const BLEND_MODES = [
   { label: 'Exclusion (Experimental)', value: 'exclusion' },
 ];
 
+const SHADER_PRESETS = {
+  'paper-texture': paperTexturePresets,
+  'fluted-glass': flutedGlassPresets,
+  'water': waterPresets,
+  'image-dithering': imageDitheringPresets,
+  'halftone-dots': halftoneDotsPresets,
+  'halftone-cmyk': halftoneCmykPresets
+};
+
 function App() {
   const [colors, setColors] = useState([...DEFAULT_COLORS]);
   const [activeRatio, setActiveRatio] = useState(RATIOS[0]);
@@ -28,8 +46,24 @@ function App() {
   const [isBlurred, setIsBlurred] = useState(true);
   const [blurStrength, setBlurStrength] = useState(100);
   const [blendMode, setBlendMode] = useState('dynamic');
+  const [activeShader, setActiveShader] = useState('none');
+  const [activePreset, setActivePreset] = useState('');
+  const [gradientDataUrl, setGradientDataUrl] = useState(null);
   
   const canvasRef = useRef(null);
+  const shaderRef = useRef(null);
+
+  const handleShaderChange = (shaderType) => {
+    setActiveShader(shaderType);
+    if (shaderType !== 'none') {
+      const presets = SHADER_PRESETS[shaderType];
+      if (presets && presets.length > 0) {
+        setActivePreset(presets[0].name);
+      }
+    } else {
+      setActivePreset('');
+    }
+  };
 
   const handleColorChange = (index, value) => {
     const newColors = [...colors];
@@ -69,8 +103,9 @@ function App() {
   }, []);
 
   const handleExport = () => {
-    if (canvasRef.current) {
-      const dataUrl = canvasRef.current.exportToDataURL();
+    const activeRef = activeShader === 'none' ? canvasRef : shaderRef;
+    if (activeRef.current) {
+      const dataUrl = activeRef.current.exportToDataURL();
       if (dataUrl) {
         const link = document.createElement('a');
         link.download = `gradient-${Date.now()}.png`;
@@ -167,6 +202,37 @@ function App() {
         </div>
 
         <div className="control-group">
+          <label className="control-label">Shader Overlay</label>
+          <select 
+            value={activeShader} 
+            onChange={(e) => handleShaderChange(e.target.value)}
+            className="select-input"
+          >
+            <option value="none">None</option>
+            <option value="paper-texture">Paper Texture</option>
+            <option value="fluted-glass">Fluted Glass</option>
+            <option value="water">Water</option>
+            <option value="image-dithering">Image Dithering</option>
+            <option value="halftone-dots">Halftone Dots</option>
+            <option value="halftone-cmyk">Halftone CMYK</option>
+          </select>
+
+          {activeShader !== 'none' && SHADER_PRESETS[activeShader] && (
+            <div className="preset-grid">
+              {SHADER_PRESETS[activeShader].map((preset) => (
+                <button
+                  key={preset.name}
+                  className={`preset-btn ${activePreset === preset.name ? 'active' : ''}`}
+                  onClick={() => setActivePreset(preset.name)}
+                >
+                  {preset.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="control-group">
           <div className="slider-header">
             <label className="control-label" style={{ marginBottom: 0 }}>Blur Strength</label>
             <span className="slider-value">{blurStrength}%</span>
@@ -213,17 +279,31 @@ function App() {
 
       {/* Main Canvas Area */}
       <div className="main-content">
-        <GradientCanvas 
-          ref={canvasRef}
-          colors={colors}
-          width={activeRatio.width}
-          height={activeRatio.height}
-          seed={seed}
-          glassIntensity={0}
-          isBlurred={isBlurred}
-          blurStrength={blurStrength}
-          blendMode={blendMode}
-        />
+        <div style={{ display: activeShader === 'none' ? 'block' : 'none' }}>
+          <GradientCanvas 
+            ref={canvasRef}
+            colors={colors}
+            width={activeRatio.width}
+            height={activeRatio.height}
+            seed={seed}
+            glassIntensity={0}
+            isBlurred={isBlurred}
+            blurStrength={blurStrength}
+            blendMode={blendMode}
+            onRender={setGradientDataUrl}
+          />
+        </div>
+
+        {activeShader !== 'none' && (
+          <ShaderPreview 
+            ref={shaderRef}
+            shaderType={activeShader}
+            presetName={activePreset}
+            imageUrl={gradientDataUrl}
+            width={activeRatio.width}
+            height={activeRatio.height}
+          />
+        )}
       </div>
     </div>
   );

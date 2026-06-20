@@ -90,6 +90,10 @@ function App() {
       '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')
     ));
 
+    // Randomize blur strength between 45 and 100, and ensure blur is enabled
+    setBlurStrength(Math.floor(Math.random() * 56) + 45);
+    setIsBlurred(true);
+
     const shaderTypes = ['none', 'paper-texture', 'fluted-glass', 'water', 'image-dithering', 'halftone-dots', 'halftone-cmyk'];
     const randomShader = shaderTypes[Math.floor(Math.random() * shaderTypes.length)];
     setActiveShader(randomShader);

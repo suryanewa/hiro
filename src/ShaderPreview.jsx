@@ -9,12 +9,12 @@ import {
 } from '@paper-design/shaders-react';
 
 const SHADER_COMPONENTS = {
-  'paper-texture': { Component: PaperTexture, presets: paperTexturePresets },
+  'paper-texture': { Component: PaperTexture, presets: paperTexturePresets.filter(p => p.name !== 'Cardboard' && p.name !== 'Details') },
   'fluted-glass': { Component: FlutedGlass, presets: flutedGlassPresets },
   'water': { Component: Water, presets: waterPresets },
-  'image-dithering': { Component: ImageDithering, presets: imageDitheringPresets },
-  'halftone-dots': { Component: HalftoneDots, presets: halftoneDotsPresets },
-  'halftone-cmyk': { Component: HalftoneCmyk, presets: halftoneCmykPresets }
+  'image-dithering': { Component: ImageDithering, presets: imageDitheringPresets.filter(p => p.name !== 'Default' && p.name !== 'Noise') },
+  'halftone-dots': { Component: HalftoneDots, presets: halftoneDotsPresets.filter(p => p.name !== 'Default' && p.name !== 'LED screen' && p.name !== 'Round and square') },
+  'halftone-cmyk': { Component: HalftoneCmyk, presets: halftoneCmykPresets.filter(p => p.name !== 'Newspaper' && p.name !== 'Drops') }
 };
 
 const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, height }, ref) => {

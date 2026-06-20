@@ -31,12 +31,12 @@ const BLEND_MODES = [
 ];
 
 const SHADER_PRESETS = {
-  'paper-texture': paperTexturePresets,
+  'paper-texture': paperTexturePresets.filter(p => p.name !== 'Cardboard' && p.name !== 'Details'),
   'fluted-glass': flutedGlassPresets,
   'water': waterPresets,
-  'image-dithering': imageDitheringPresets,
-  'halftone-dots': halftoneDotsPresets,
-  'halftone-cmyk': halftoneCmykPresets
+  'image-dithering': imageDitheringPresets.filter(p => p.name !== 'Default' && p.name !== 'Noise'),
+  'halftone-dots': halftoneDotsPresets.filter(p => p.name !== 'Default' && p.name !== 'LED screen' && p.name !== 'Round and square'),
+  'halftone-cmyk': halftoneCmykPresets.filter(p => p.name !== 'Newspaper' && p.name !== 'Drops')
 };
 
 function App() {

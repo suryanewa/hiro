@@ -1,55 +1,13 @@
-import { zipSync } from 'fflate';
-import { renderGradient } from './gradientRenderer';
-import gradientRendererSource from './gradientRenderer.js?raw';
+import { renderGradient } from '../gradientRenderer.js';
 
 const SHADER_REACT_COMPONENTS = {
   'paper-texture': 'PaperTexture',
   'fluted-glass': 'FlutedGlass',
-  'water': 'Water',
+  water: 'Water',
   'image-dithering': 'ImageDithering',
   'halftone-dots': 'HalftoneDots',
   'halftone-cmyk': 'HalftoneCmyk',
 };
-
-export function renderGradientToDataUrl(options) {
-  const canvas = document.createElement('canvas');
-  canvas.width = options.width;
-  canvas.height = options.height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-  renderGradient(ctx, options);
-  return canvas.toDataURL('image/png');
-}
-
-function dataUrlToBytes(dataUrl) {
-  const base64 = dataUrl.split(',')[1];
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-
-function textToBytes(text) {
-  return new TextEncoder().encode(text);
-}
-
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = url;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-export function buildExportBaseName(ratioLabel) {
-  const ratioSlug = ratioLabel.replace(':', 'x').toLowerCase();
-  return `hiro-${ratioSlug}-${Date.now()}`;
-}
 
 function getShaderScale(shaderType) {
   if (shaderType === 'water' || shaderType === 'fluted-glass') return 1.25;
@@ -57,7 +15,7 @@ function getShaderScale(shaderType) {
   return 1;
 }
 
-function getShaderExtraProps(shaderType, presetName, presetParams) {
+export function getShaderExtraProps(shaderType, presetName, presetParams = {}) {
   const shaderScale = getShaderScale(shaderType);
   const props = {
     fit: 'cover',
@@ -92,13 +50,17 @@ function getShaderExtraProps(shaderType, presetName, presetParams) {
   return props;
 }
 
-function buildReactShaderSnippet(config) {
+export function buildReactShaderSnippet(config) {
   const { activeShader, activePreset, presetParams, width, height } = config;
   const componentName = SHADER_REACT_COMPONENTS[activeShader];
   const shaderProps = getShaderExtraProps(activeShader, activePreset, presetParams);
   const paperTextureFilter = activeShader === 'paper-texture'
     ? "filter: 'contrast(1.25) saturate(1.25) brightness(1.05)',"
     : '';
+
+  if (!componentName) {
+    return '';
+  }
 
   return `import { useEffect, useRef, useState } from 'react';
 import { ${componentName} } from '@paper-design/shaders-react';
@@ -153,12 +115,14 @@ export default function GradientBackground() {
 }`;
 }
 
-function buildStandaloneRendererScript() {
-  return gradientRendererSource
-    .replace(/^export function renderGradient/m, 'function renderGradient');
+export function buildStandaloneRendererScript(rendererSource) {
+  if (rendererSource) {
+    return rendererSource.replace(/^export function renderGradient/m, 'function renderGradient');
+  }
+  return renderGradient.toString();
 }
 
-export function generateReplicationHtml(config) {
+export function generateReplicationHtml(config, { rendererSource } = {}) {
   const {
     colors,
     seed,
@@ -170,8 +134,8 @@ export function generateReplicationHtml(config) {
     showRing,
     activeShader,
     activePreset,
-    pngFilename,
-    ratioLabel,
+    pngFilename = 'hiro-gradient.png',
+    ratioLabel = `${width}x${height}`,
   } = config;
 
   const gradientConfig = {
@@ -182,8 +146,6 @@ export function generateReplicationHtml(config) {
     blendMode,
     showRing,
   };
-
-  const rendererScript = buildStandaloneRendererScript();
   const hasShader = activeShader && activeShader !== 'none';
   const shaderLabel = hasShader
     ? `${activeShader}${activePreset ? ` (${activePreset})` : ''}`
@@ -195,7 +157,7 @@ export function generateReplicationHtml(config) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hiro Background — ${ratioLabel} (${width}×${height})</title>
+  <title>Hiro Background - ${ratioLabel} (${width}x${height})</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
@@ -209,7 +171,7 @@ export function generateReplicationHtml(config) {
 <body>
   <!--
     Shader: ${shaderLabel}
-    This page uses the exported PNG (${width}×${height}) which includes the shader effect.
+    This page uses the exported PNG (${width}x${height}) which includes the shader effect.
     For a live, parametric version with the same shader, use GradientBackground.jsx
     and gradientRenderer.js from this export bundle.
   -->
@@ -223,7 +185,7 @@ export function generateReplicationHtml(config) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hiro Background — ${ratioLabel} (${width}×${height})</title>
+  <title>Hiro Background - ${ratioLabel} (${width}x${height})</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
@@ -238,7 +200,7 @@ export function generateReplicationHtml(config) {
 <body>
   <canvas id="background" aria-hidden="true"></canvas>
   <script>
-${rendererScript}
+${buildStandaloneRendererScript(rendererSource)}
 
     const CONFIG = ${JSON.stringify(gradientConfig, null, 4)};
 
@@ -258,137 +220,4 @@ ${rendererScript}
   </script>
 </body>
 </html>`;
-}
-
-function buildReadme(config) {
-  const { ratioLabel, width, height, activeShader, activePreset, pngFilename, htmlFilename } = config;
-  const hasShader = activeShader && activeShader !== 'none';
-
-  const lines = [
-    'Hiro Export',
-    '===========',
-    '',
-    `Aspect ratio: ${ratioLabel} (${width}×${height})`,
-    '',
-    'Files:',
-    `- ${pngFilename} — rendered background at export resolution`,
-    `- ${htmlFilename} — open in a browser to use the background on the web`,
-  ];
-
-  if (hasShader) {
-    lines.push(
-      '- gradientRenderer.js — canvas gradient generator (base layer)',
-      '- GradientBackground.jsx — React component with live shader overlay',
-      '',
-      `Shader: ${activeShader}${activePreset ? ` (${activePreset})` : ''}`,
-      '',
-      'The HTML file references the PNG (same folder) to show the shader effect.',
-      'Shaders require React and @paper-design/shaders-react — see GradientBackground.jsx.',
-    );
-  } else {
-    lines.push(
-      '',
-      'The HTML file renders the gradient parametrically in a canvas (no dependencies).',
-    );
-  }
-
-  return lines.join('\n');
-}
-
-export function exportBackground({
-  colors,
-  seed,
-  width,
-  height,
-  ratioLabel,
-  isBlurred,
-  blurStrength,
-  blendMode,
-  showRing,
-  activeShader,
-  activePreset,
-  presetParams,
-  getDisplayedDataUrl,
-  gradientDataUrl,
-}) {
-  const baseName = buildExportBaseName(ratioLabel);
-  const pngFilename = `${baseName}.png`;
-  const htmlFilename = `${baseName}.html`;
-  const hasShader = activeShader && activeShader !== 'none';
-
-  let pngDataUrl = getDisplayedDataUrl?.() ?? null;
-
-  if (!pngDataUrl) {
-    pngDataUrl = renderGradientToDataUrl({
-      colors,
-      width,
-      height,
-      seed,
-      isBlurred,
-      blurStrength,
-      blendMode,
-      showRing,
-    });
-  }
-
-  if (!pngDataUrl && gradientDataUrl) {
-    pngDataUrl = gradientDataUrl;
-  }
-
-  if (!pngDataUrl) return false;
-
-  const html = generateReplicationHtml({
-    colors,
-    seed,
-    width,
-    height,
-    ratioLabel,
-    isBlurred,
-    blurStrength,
-    blendMode,
-    showRing,
-    activeShader,
-    activePreset,
-    presetParams,
-    pngFilename,
-    pngDataUrl,
-  });
-
-  const zipEntries = {
-    [pngFilename]: dataUrlToBytes(pngDataUrl),
-    [htmlFilename]: textToBytes(html),
-    'README.txt': textToBytes(buildReadme({
-      ratioLabel,
-      width,
-      height,
-      activeShader,
-      activePreset,
-      pngFilename,
-      htmlFilename,
-    })),
-  };
-
-  if (hasShader) {
-    zipEntries['gradientRenderer.js'] = textToBytes(gradientRendererSource);
-    zipEntries['GradientBackground.jsx'] = textToBytes(
-      buildReactShaderSnippet({
-        colors,
-        seed,
-        width,
-        height,
-        isBlurred,
-        blurStrength,
-        blendMode,
-        showRing,
-        activeShader,
-        activePreset,
-        presetParams: presetParams || {},
-      })
-    );
-  }
-
-  const zipped = zipSync(zipEntries);
-  downloadBlob(new Blob([zipped], { type: 'application/zip' }), `${baseName}.zip`);
-
-  return true;
 }

@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   PaperTexture, paperTexturePresets,

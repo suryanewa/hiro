@@ -208,25 +208,19 @@ const generateFarbveloPalette = (count, vibrancy = 'vibrant') => {
   const numHues = Math.max(count, Math.round(360 / minHueDiffAngle));
   const hues = Array.from({ length: numHues }, (_, i) => (baseHue + i * minHueDiffAngle) % 360);
   
-  let minSat, maxSat, minLight, maxLight, baseSaturation;
+  let minSat, maxSat, baseSaturation;
   if (vibrancy === 'subtle') {
     baseSaturation = 10 + Math.random() * 20;
     minSat = 20 + Math.random() * 20;
     maxSat = minSat + 20;
-    minLight = 50 + Math.random() * 20;
-    maxLight = minLight + 20;
   } else if (vibrancy === 'normal') {
     baseSaturation = 20 + Math.random() * 30;
     minSat = 40 + Math.random() * 20;
     maxSat = minSat + 30;
-    minLight = 30 + Math.random() * 20;
-    maxLight = minLight + 40;
   } else { // vibrant
     baseSaturation = 30 + Math.random() * 40;
     minSat = 60 + Math.random() * 20;
     maxSat = Math.min(100, minSat + 30);
-    minLight = 20 + Math.random() * 20;
-    maxLight = Math.min(95, minLight + 50);
   }
 
   const baseLightness = Math.random() * (vibrancy === 'subtle' ? 40 : 20);
@@ -724,59 +718,6 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  const generateHarmonicColors = (baseHue, count, vibrancyType) => {
-    const newColors = [];
-    let s = 80;
-    let l = 50;
-
-    for (let i = 0; i < count; i++) {
-      let h = baseHue;
-      if (vibrancyType === 'pastel') {
-        s = 55 + Math.random() * 15;
-        l = 75 + Math.random() * 15;
-        h = (baseHue + (i * (360 / count))) % 360;
-      } else if (vibrancyType === 'monochrome') {
-        s = 10 + Math.random() * 20;
-        l = 15 + (i * (75 / count));
-      } else if (vibrancyType === 'neon') {
-        s = 95 + Math.random() * 5;
-        l = 45 + Math.random() * 10;
-        h = (baseHue + (i * 45)) % 360;
-      } else { // vibrant
-        s = 75 + Math.random() * 20;
-        l = 40 + Math.random() * 20;
-        if (count === 2) {
-          if (i === 1) h = (baseHue + 180) % 360;
-        } else if (count === 3) {
-          if (i === 1) h = (baseHue + 120) % 360;
-          else if (i === 2) h = (baseHue + 240) % 360;
-        } else {
-          if (i === 1) h = (baseHue + 90) % 360;
-          else if (i === 2) h = (baseHue + 180) % 360;
-          else h = (baseHue + 220) % 360;
-          h = (h + (Math.random() * 20 - 10)) % 360;
-        }
-        
-        // Dynamic contrast for vibrant
-        if (i % 2 === 1) {
-          l = Math.max(15, l - 15);
-        } else {
-          l = Math.min(85, l + 15);
-        }
-        
-        if (i === count - 1) {
-           l = Math.random() > 0.5 ? 10 + Math.random() * 10 : 90 + Math.random() * 8;
-           s = 90 + Math.random() * 10;
-        }
-      }
-      
-      if (h < 0) h += 360;
-      const rgb = rybHsl2rgb([h, s / 100, l / 100]);
-      newColors.push(rgbToHex(rgb[0], rgb[1], rgb[2]));
-    }
-    return newColors;
-  };
-
   const handleColorChange = (index, value) => {
     const newColors = [...colors];
     newColors[index] = value;
@@ -812,12 +753,6 @@ function App() {
       const newColors = colors.filter((_, i) => i !== index);
       setColors(newColors);
     }
-  };
-
-  const randomizePalette = () => {
-    const randomVibrancy = ['vibrant', 'pastel', 'monochrome', 'neon'][Math.floor(Math.random() * 4)];
-    const randomCount = Math.floor(Math.random() * 5) + 2; // Between 2 and 6 colors
-    setColors(prevColors => generateDifferentPalette(randomCount, randomVibrancy, prevColors));
   };
 
   const spaceHoldRef = useRef(null);

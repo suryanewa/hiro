@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "api": "node server.js",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test test/api.test.js",
+    "test:api": "node --test test/api.test.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

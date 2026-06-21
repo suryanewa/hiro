@@ -24,11 +24,19 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
   useImperativeHandle(ref, () => ({
     exportToDataURL: () => {
       const element = shaderElementRef.current;
-      const canvas = element?.paperShaderMount?.canvasElement;
-      if (!canvas) return null;
-      return canvas.toDataURL('image/png');
+      const sourceCanvas = element?.paperShaderMount?.canvasElement;
+      if (!sourceCanvas) return null;
+
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = width;
+      exportCanvas.height = height;
+      const ctx = exportCanvas.getContext('2d');
+      if (!ctx) return null;
+
+      ctx.drawImage(sourceCanvas, 0, 0, width, height);
+      return exportCanvas.toDataURL('image/png');
     }
-  }));
+  }), [width, height]);
 
   const shaderConfig = SHADER_COMPONENTS[shaderType];
   if (!shaderConfig) return null;

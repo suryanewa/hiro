@@ -22,6 +22,7 @@ import {
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
 import GradientCanvas from './GradientCanvas';
 import ShaderPreview from './ShaderPreview';
+import { exportBackground } from './exportBackground';
 import { 
   paperTexturePresets, 
   flutedGlassPresets, 
@@ -905,17 +906,26 @@ function App() {
 
   const handleExport = () => {
     const activeRef = activeShader === 'none' ? canvasRef : shaderRef;
-    if (activeRef.current) {
-      const dataUrl = activeRef.current.exportToDataURL();
-      if (dataUrl) {
-        const link = document.createElement('a');
-        link.download = `gradient-${Date.now()}.png`;
-        link.href = dataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    }
+    const preset = activeShader !== 'none'
+      ? SHADER_PRESETS[activeShader]?.find((p) => p.name === activePreset)
+      : null;
+
+    exportBackground({
+      colors,
+      seed,
+      width: activeRatio.width,
+      height: activeRatio.height,
+      ratioLabel: activeRatio.label,
+      isBlurred,
+      blurStrength,
+      blendMode,
+      showRing,
+      activeShader,
+      activePreset,
+      presetParams: preset?.params ?? {},
+      gradientDataUrl,
+      getDisplayedDataUrl: () => activeRef.current?.exportToDataURL?.() ?? null,
+    });
   };
 
   const highlightedRatio = hoveredRatio !== null ? hoveredRatio : activeRatio.label;

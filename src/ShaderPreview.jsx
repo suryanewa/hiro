@@ -45,6 +45,9 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
   // For the default fluted glass, scale up the glass pattern (rib width) by setting size to 0.92 (default is 0.5)
   const isDefaultFlutedGlass = shaderType === 'fluted-glass' && (presetName === 'Default' || !presetName);
 
+  // For the default paper texture, use custom parameters
+  const isDefaultPaperTexture = shaderType === 'paper-texture' && (presetName === 'Default' || !presetName);
+
   // Visual scaling logic (matches GradientCanvas)
   const activeContainerHeight = containerHeight || 600;
   const renderScale = (activeContainerHeight / height) * zoom;
@@ -79,6 +82,22 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
             fit="cover"
             scale={shaderScale}
             {...(isDefaultFlutedGlass ? { size: 0.92, shift: -0.18, scale: shaderScale * 1.1 } : {})}
+            {...(isDefaultPaperTexture ? {
+              colorBack: '#ffffff',
+              colorFront: '#ffffff',
+              contrast: 0.3,
+              roughness: 0,
+              fiber: 0.25,
+              fiberSize: 0.15,
+              crumples: 0.15,
+              crumpleSize: 0.1,
+              folds: 0,
+              foldCount: 1,
+              drops: 0,
+              fade: 0.4,
+              seed: 0,
+              scale: 0.5
+            } : {})}
             style={{ 
               width: '100%', 
               height: '100%', 

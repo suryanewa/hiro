@@ -200,6 +200,26 @@ function TakiSlider({ value, min = 0, max = 100, step = 1, onChange }) {
   );
 }
 
+function TakiSwitch({ checked, onChange, label }) {
+  return (
+    <div className="taki-switch-row" onClick={() => onChange(!checked)}>
+      <span className="control-label">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        className={`taki-switch ${checked ? 'checked' : ''}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onChange(!checked);
+        }}
+      >
+        <span className="taki-switch-thumb" />
+      </button>
+    </div>
+  );
+}
+
 function HexPicker({ value, onChange }) {
   const color = React.useMemo(() => {
     try {
@@ -351,6 +371,7 @@ function App() {
   const [hoveredPreset, setHoveredPreset] = useState(null);
   const [gradientDataUrl, setGradientDataUrl] = useState(null);
   const [zoom, setZoom] = useState(1);
+  const [showRing, setShowRing] = useState(false);
   
   const canvasRef = useRef(null);
   const shaderRef = useRef(null);
@@ -595,6 +616,12 @@ function App() {
           />
         </div>
 
+        <TakiSwitch 
+          label="Edge Frame"
+          checked={showRing}
+          onChange={setShowRing}
+        />
+
         <AnimatedSelect
           label="Vibrancy"
           value={vibrancy}
@@ -705,6 +732,7 @@ function App() {
               onRender={setGradientDataUrl}
               zoom={zoom}
               containerHeight={containerHeight}
+              showRing={showRing}
             />
           </div>
 

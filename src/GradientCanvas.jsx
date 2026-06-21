@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 
-const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity = 0.1, isBlurred = true, blurStrength = 100, blendMode = 'dynamic', onRender, zoom = 1, containerHeight }, ref) => {
+const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity = 0.1, isBlurred = true, blurStrength = 100, blendMode = 'dynamic', onRender, zoom = 1, containerHeight, showRing }, ref) => {
   const canvasRef = useRef(null);
 
   // Expose export function to parent
@@ -262,6 +262,24 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
     
     ctx.globalAlpha = 1.0;
 
+    // 2.5 Draw Edge Ring (if enabled)
+    if (showRing) {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = colors[0] || '#000000';
+      
+      // Calculate a responsive line width (e.g. 12% of the canvas smaller dimension)
+      const strokeThickness = Math.min(width, height) * 0.12; 
+      ctx.lineWidth = strokeThickness;
+      
+      // Draw strokeRect centered on the stroke line (insetting by half thickness)
+      ctx.strokeRect(
+        strokeThickness / 2, 
+        strokeThickness / 2, 
+        width - strokeThickness, 
+        height - strokeThickness
+      );
+    }
+
     // 3. Reset filter for overlay
     ctx.filter = 'none';
 
@@ -271,7 +289,7 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
     if (onRender) {
       onRender(canvas.toDataURL('image/png'));
     }
-  }, [colors, width, height, seed, glassIntensity, isBlurred, blurStrength, blendMode, onRender]);
+  }, [colors, width, height, seed, glassIntensity, isBlurred, blurStrength, blendMode, onRender, showRing]);
 
   // Visual scaling logic so it fits the screen's height
   const activeContainerHeight = containerHeight || 600;

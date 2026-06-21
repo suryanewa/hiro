@@ -862,3 +862,51 @@ body {
   z-index: 0;
   pointer-events: none;
 }
+
+/* Taki Switch Toggle */
+.taki-switch-row {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 20px;
+}
+
+.taki-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 9999px;
+  background-color: var(--muted);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s var(--ease-standard), border-color 0.2s var(--ease-standard);
+  outline: none;
+  display: flex;
+  align-items: center;
+}
+
+.taki-switch.checked {
+  background-color: var(--text-main);
+  border-color: var(--text-main);
+}
+
+.taki-switch-thumb {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--text-main);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s var(--ease-standard), background-color 0.2s var(--ease-standard);
+}
+
+.taki-switch.checked .taki-switch-thumb {
+  transform: translateX(16px);
+  background-color: var(--bg-main);
+}

@@ -33,6 +33,7 @@ import {
 import { rybHsl2rgb } from 'rybitten';
 import { generateRandomColorRamp } from 'fettepalette';
 import { generateColorRampWithCurve } from 'rampensau';
+import { Poline, positionFunctions, randomHSLPair } from 'poline';
 
 const DEFAULT_COLORS = ['#0f172a', '#3b82f6', '#8b5cf6', '#000000'];
 
@@ -350,12 +351,44 @@ const generateRampensauPalette = (count, vibrancy = 'vibrant') => {
   });
 };
 
+const generatePolinePalette = (count, vibrancy = 'vibrant') => {
+  let saturations, lightnesses;
+  if (vibrancy === 'subtle') {
+    saturations = [0.15 + Math.random() * 0.15, 0.3 + Math.random() * 0.15];
+    lightnesses = [0.35 + Math.random() * 0.15, 0.7 + Math.random() * 0.15];
+  } else if (vibrancy === 'normal') {
+    saturations = [0.3 + Math.random() * 0.2, 0.55 + Math.random() * 0.2];
+    lightnesses = [0.15 + Math.random() * 0.2, 0.8 + Math.random() * 0.15];
+  } else {
+    saturations = [0.55 + Math.random() * 0.2, 0.85 + Math.random() * 0.15];
+    lightnesses = [0.05 + Math.random() * 0.15, 0.9 + Math.random() * 0.08];
+  }
+
+  const startHue = Math.random() * 360;
+  const anchorColors = randomHSLPair(startHue, saturations, lightnesses);
+
+  const funcs = Object.values(positionFunctions);
+  const positionFunction = funcs[Math.floor(Math.random() * funcs.length)];
+
+  const poline = new Poline({
+    anchorColors,
+    numPoints: Math.max(0, count - 2),
+    positionFunction,
+  });
+
+  return poline.colors.slice(0, count).map(([h, s, l]) => {
+    const rgb = rybHsl2rgb([h, s, l]);
+    return rgbToHex(rgb[0], rgb[1], rgb[2]);
+  });
+};
+
 const generateRandomPalette = (count, vibrancy = 'vibrant') => {
   const r = Math.random();
-  if (r < 0.25) return generateHarmonicPalette(count, vibrancy);
-  if (r < 0.50) return generateFarbveloPalette(count, vibrancy);
-  if (r < 0.75) return generateFettePalette(count, vibrancy);
-  return generateRampensauPalette(count, vibrancy);
+  if (r < 0.2) return generateHarmonicPalette(count, vibrancy);
+  if (r < 0.4) return generateFarbveloPalette(count, vibrancy);
+  if (r < 0.6) return generateFettePalette(count, vibrancy);
+  if (r < 0.8) return generateRampensauPalette(count, vibrancy);
+  return generatePolinePalette(count, vibrancy);
 };
 
 function TakiSlider({ value, min = 0, max = 100, step = 1, onChange }) {

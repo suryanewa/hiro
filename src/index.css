@@ -524,17 +524,14 @@ body {
 
 .preview-content-wrapper {
   display: flex;
+  justify-content: center;
+  align-items: center;
   min-width: 100%;
   min-height: 100%;
-  box-sizing: border-box;
-}
-
-.canvas-scroll-padding-container {
+  width: max-content;
+  height: max-content;
   padding: 48px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-sizing: border-box;
 }
 
 .preview-scroll-container::-webkit-scrollbar {

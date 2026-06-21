@@ -748,10 +748,7 @@ function App() {
       <div className="main-content">
         <div className="preview-scroll-container" ref={containerRef}>
           <div className="preview-content-wrapper">
-            <div 
-              className="canvas-scroll-padding-container" 
-              style={{ display: activeShader === 'none' ? 'flex' : 'none' }}
-            >
+            <div style={{ display: activeShader === 'none' ? 'block' : 'none' }}>
               <GradientCanvas 
                 ref={canvasRef}
                 colors={colors}
@@ -770,18 +767,16 @@ function App() {
             </div>
 
             {activeShader !== 'none' && (
-              <div className="canvas-scroll-padding-container">
-                <ShaderPreview 
-                  ref={shaderRef}
-                  shaderType={activeShader}
-                  presetName={activePreset}
-                  imageUrl={gradientDataUrl}
-                  width={activeRatio.width}
-                  height={activeRatio.height}
-                  zoom={zoom}
-                  containerHeight={containerHeight}
-                />
-              </div>
+              <ShaderPreview 
+                ref={shaderRef}
+                shaderType={activeShader}
+                presetName={activePreset}
+                imageUrl={gradientDataUrl}
+                width={activeRatio.width}
+                height={activeRatio.height}
+                zoom={zoom}
+                containerHeight={containerHeight}
+              />
             )}
           </div>
         </div>

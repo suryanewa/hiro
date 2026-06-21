@@ -247,10 +247,7 @@ function App() {
       <div className="sidebar">
         <div className="sidebar-header">
           <h1 className="sidebar-title">
-            <div style={{
-              width: 24, height: 24, borderRadius: 6,
-              background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)'
-            }} />
+            <img src="/favicon.svg" alt="Hiro logo" style={{ width: 24, height: 24 }} />
             Hiro
           </h1>
         </div>

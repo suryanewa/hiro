@@ -248,7 +248,7 @@ function App() {
         <div className="sidebar-header">
           <h1 className="sidebar-title">
             <img src="/favicon.svg" alt="Hiro logo" style={{ width: 30, height: 30 }} />
-            Hiro
+            iro
           </h1>
         </div>
 

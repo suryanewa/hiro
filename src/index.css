@@ -59,12 +59,13 @@ body {
 }
 
 .sidebar-title {
-  font-size: 25px;
+  font-size: 32px;
   font-weight: 600;
   letter-spacing: -0.02em;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-end;
+  gap: 2px;
+  line-height: 0.85;
 }
 
 .main-content {

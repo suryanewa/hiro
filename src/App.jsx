@@ -354,6 +354,26 @@ function App() {
   
   const canvasRef = useRef(null);
   const shaderRef = useRef(null);
+  const containerRef = useRef(null);
+  const [containerHeight, setContainerHeight] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return Math.max(400, window.innerHeight - 150);
+    }
+    return 600;
+  });
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.height > 0) {
+          setContainerHeight(entry.contentRect.height);
+        }
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const generateHarmonicColors = (baseHue, count, vibrancyType) => {
     const newColors = [];
@@ -670,7 +690,7 @@ function App() {
 
       {/* Main Canvas Area */}
       <div className="main-content">
-        <div className="preview-scroll-container">
+        <div className="preview-scroll-container" ref={containerRef}>
           <div style={{ display: activeShader === 'none' ? 'block' : 'none' }}>
             <GradientCanvas 
               ref={canvasRef}
@@ -684,6 +704,7 @@ function App() {
               blendMode={blendMode}
               onRender={setGradientDataUrl}
               zoom={zoom}
+              containerHeight={containerHeight}
             />
           </div>
 
@@ -696,6 +717,7 @@ function App() {
               width={activeRatio.width}
               height={activeRatio.height}
               zoom={zoom}
+              containerHeight={containerHeight}
             />
           )}
         </div>

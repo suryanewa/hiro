@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 
-const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity = 0.1, isBlurred = true, blurStrength = 100, blendMode = 'dynamic', onRender, zoom = 1 }, ref) => {
+const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity = 0.1, isBlurred = true, blurStrength = 100, blendMode = 'dynamic', onRender, zoom = 1, containerHeight }, ref) => {
   const canvasRef = useRef(null);
 
   // Expose export function to parent
@@ -273,8 +273,9 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
     }
   }, [colors, width, height, seed, glassIntensity, isBlurred, blurStrength, blendMode, onRender]);
 
-  // Visual scaling logic so it fits the screen without changing actual export resolution
-  const renderScale = Math.min(1, 800 / Math.max(width, height)) * 1.75 * zoom;
+  // Visual scaling logic so it fits the screen's height
+  const activeContainerHeight = containerHeight || 600;
+  const renderScale = (activeContainerHeight / height) * zoom;
 
   return (
     <div 

@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { motion } from 'framer-motion';
 import { renderGradient } from './gradientRenderer';
+
+const RATIO_TRANSITION = { type: 'spring', stiffness: 380, damping: 32 };
 
 const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity = 0.1, isBlurred = true, blurStrength = 100, blendMode = 'dynamic', onRender, zoom = 1, containerHeight, showRing }, ref) => {
   const canvasRef = useRef(null);
@@ -42,12 +45,14 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
   const renderScale = (activeContainerHeight / height) * zoom;
 
   return (
-    <div 
+    <motion.div 
       className="canvas-wrapper"
-      style={{
-        width: `${width * renderScale}px`,
-        height: `${height * renderScale}px`
+      initial={false}
+      animate={{
+        width: width * renderScale,
+        height: height * renderScale,
       }}
+      transition={RATIO_TRANSITION}
     >
       <canvas 
         ref={canvasRef} 
@@ -56,7 +61,7 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
           height: '100%'
         }}
       />
-    </div>
+    </motion.div>
   );
 });
 

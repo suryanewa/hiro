@@ -1,5 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import { 
+import { motion } from 'framer-motion';
+import {
   PaperTexture, paperTexturePresets,
   FlutedGlass, flutedGlassPresets,
   Water, waterPresets,
@@ -7,6 +8,8 @@ import {
   HalftoneDots, halftoneDotsPresets,
   HalftoneCmyk, halftoneCmykPresets
 } from '@paper-design/shaders-react';
+
+const RATIO_TRANSITION = { type: 'spring', stiffness: 380, damping: 32 };
 
 const SHADER_COMPONENTS = {
   'paper-texture': { Component: PaperTexture, presets: paperTexturePresets.filter(p => p.name !== 'Cardboard' && p.name !== 'Details') },
@@ -60,26 +63,20 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
   const activeContainerHeight = containerHeight || 600;
   const renderScale = (activeContainerHeight / height) * zoom;
 
+  const displayWidth = width * renderScale;
+  const displayHeight = height * renderScale;
+
   return (
-    <div 
+    <motion.div 
       className="canvas-wrapper"
-      style={{
-        width: `${width * renderScale}px`,
-        height: `${height * renderScale}px`
+      initial={false}
+      animate={{
+        width: displayWidth,
+        height: displayHeight,
       }}
+      transition={RATIO_TRANSITION}
     >
       {imageUrl ? (
-        <div
-          style={{
-            width: `${width}px`,
-            height: `${height}px`,
-            transform: `scale(${renderScale})`,
-            transformOrigin: 'top left',
-            position: 'absolute',
-            top: 0,
-            left: 0
-          }}
-        >
           <Component
             key={imageUrl}
             ref={shaderElementRef}
@@ -112,11 +109,10 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
               filter: shaderType === 'paper-texture' ? 'contrast(1.25) saturate(1.25) brightness(1.05)' : 'none'
             }}
           />
-        </div>
       ) : (
         <div style={{ width: '100%', height: '100%', background: 'var(--bg-sidebar)' }} />
       )}
-    </div>
+    </motion.div>
   );
 });
 

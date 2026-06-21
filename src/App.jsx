@@ -674,6 +674,7 @@ function App() {
   const scrollStateRef = useRef(null);
   const prevZoomRef = useRef(1);
   const PREVIEW_PADDING = 48;
+  const PREVIEW_VERTICAL_MARGIN = 48;
   const [containerHeight, setContainerHeight] = useState(() => {
     if (typeof window !== 'undefined') {
       return Math.max(400, window.innerHeight - 150);
@@ -932,7 +933,8 @@ function App() {
   const highlightedPreset = hoveredPreset !== null ? hoveredPreset : activePreset;
 
   const activeContainerHeight = Math.max(containerHeight, 300);
-  const renderScale = (activeContainerHeight / activeRatio.height) * zoom;
+  const previewFitHeight = Math.max(200, activeContainerHeight - PREVIEW_VERTICAL_MARGIN * 2);
+  const renderScale = (previewFitHeight / activeRatio.height) * zoom;
   const canvasWidth = activeRatio.width * renderScale;
   const canvasHeight = activeRatio.height * renderScale;
   const wrapperWidth = canvasWidth + PREVIEW_PADDING * 2;
@@ -1146,12 +1148,14 @@ function App() {
       {/* Main Canvas Area */}
       <div className="main-content">
         <div className="preview-scroll-container" ref={containerRef}>
-          <div
+          <motion.div
             className="preview-content-wrapper"
-            style={{
-              width: `${wrapperWidth}px`,
-              height: `${wrapperHeight}px`,
+            initial={false}
+            animate={{
+              width: wrapperWidth,
+              height: wrapperHeight,
             }}
+            transition={{ type: 'spring', stiffness: 380, damping: 32 }}
           >
             <div className="canvas-absolute-center" style={{ display: activeShader === 'none' ? 'block' : 'none' }}>
               <GradientCanvas 
@@ -1166,7 +1170,7 @@ function App() {
                 blendMode={blendMode}
                 onRender={setGradientDataUrl}
                 zoom={zoom}
-                containerHeight={containerHeight}
+                containerHeight={previewFitHeight}
                 showRing={showRing}
               />
             </div>
@@ -1181,11 +1185,11 @@ function App() {
                   width={activeRatio.width}
                   height={activeRatio.height}
                   zoom={zoom}
-                  containerHeight={containerHeight}
+                  containerHeight={previewFitHeight}
                 />
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
 
 

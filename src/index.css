@@ -68,6 +68,10 @@ body {
   line-height: 0.85;
 }
 
+.sidebar-title .logo-text {
+  transform: translateY(3px);
+}
+
 .main-content {
   flex: 1;
   display: flex;

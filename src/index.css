@@ -73,21 +73,32 @@ body {
 }
 
 .sidebar-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .sidebar-title {
-  font-size: 26px;
+  font-family: 'Onest', sans-serif;
+  font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.02em;
+  color: var(--text-main);
   display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  line-height: 0.85;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+
+.sidebar-logo {
+  height: 16px;
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+  overflow: visible;
+  isolation: isolate;
 }
 
 .sidebar-title .logo-text {
-  transform: translate(-1.5px, 4px);
+  transform: translateY(1px);
 }
 
 .main-content {
@@ -134,6 +145,105 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
+}
+
+.setting-row > .control-label {
+  flex-shrink: 0;
+}
+
+/* Animated select dropdown */
+.animated-select {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.animated-select-trigger-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.animated-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-select-trigger:hover {
+  color: var(--text-main);
+}
+
+.animated-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.animated-select-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-select-menu {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.animated-select-option {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  color: var(--text-muted);
+  font-weight: 400;
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-select-option:hover {
+  color: var(--text-main);
+}
+
+.animated-select-option.is-selected {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.animated-select-option-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+}
+
+.animated-select-check {
+  flex-shrink: 0;
 }
 
 .control-label {
@@ -485,6 +595,7 @@ body {
 
 .preset-btn {
   flex: 1;
+  min-width: 0;
   position: relative;
   z-index: 1;
   background-color: transparent;
@@ -497,6 +608,13 @@ body {
   font-weight: 500;
   transition: color 0.2s var(--ease-standard);
   text-align: center;
+}
+
+.preset-btn > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preset-btn.active {

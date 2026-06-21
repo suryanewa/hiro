@@ -21,6 +21,7 @@ import {
 } from 'react-aria-components';
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
 import GradientCanvas, { RAPID_PREVIEW_MAX_DIMENSION, BLUR_SCRUB_PREVIEW_MAX_DIMENSION } from './GradientCanvas';
+import HiroLogoMark from './HiroLogoMark';
 import ShaderPreview from './ShaderPreview';
 import { exportBackground } from './exportBackground';
 import { 
@@ -607,75 +608,63 @@ function AnimatedSelect({ label, value, options, onChange }) {
   const selectedLabel = options.find(o => o.value === value)?.label || value;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="animated-select">
       <div className="setting-row">
         <label className="control-label">{label}</label>
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', 
-            color: 'var(--text-muted)', border: 'none', background: 'transparent', 
-            cursor: 'pointer', padding: 0, fontFamily: 'inherit',
-            transition: 'color 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-main)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
-        >
-          <AnimatePresence mode="popLayout" initial={false}>
-            {!open && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                style={{ color: 'inherit' }}
-              >
-                {selectedLabel}
-              </motion.span>
-            )}
-          </AnimatePresence>
-          <ChevronDown
-            size={16}
-            style={{
-              transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)'
-            }}
-          />
-        </button>
+        <div className="animated-select-trigger-wrap">
+          <button
+            type="button"
+            className="animated-select-trigger"
+            onClick={() => setOpen(!open)}
+            title={selectedLabel}
+          >
+            <AnimatePresence mode="popLayout" initial={false}>
+              {!open && (
+                <motion.span
+                  className="animated-select-value"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {selectedLabel}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <ChevronDown
+              size={16}
+              className="animated-select-chevron"
+              style={{
+                transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+            />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
+            className="animated-select-menu"
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2, ease: [0.65, 0, 0.35, 1] }}
-            style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}
           >
             {options.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
-                style={{
-                  display: 'flex', width: '100%', cursor: 'pointer', alignItems: 'center', 
-                  justifyContent: 'space-between', padding: '6px 0', fontSize: '14px',
-                  background: 'transparent', border: 'none', fontFamily: 'inherit',
-                  color: value === opt.value ? 'var(--text-main)' : 'var(--text-muted)',
-                  fontWeight: value === opt.value ? '500' : '400',
-                  transition: 'color 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-main)'}
-                onMouseLeave={(e) => e.currentTarget.style.color = value === opt.value ? 'var(--text-main)' : 'var(--text-muted)'}
+                className={`animated-select-option${value === opt.value ? ' is-selected' : ''}`}
+                title={opt.label}
                 onClick={() => {
                   onChange(opt.value);
                   setOpen(false);
                 }}
               >
-                <span>{opt.label}</span>
+                <span className="animated-select-option-label">{opt.label}</span>
                 {value === opt.value && (
-                  <Check size={16} color="var(--accent)" />
+                  <Check size={16} color="var(--accent)" className="animated-select-check" />
                 )}
               </button>
             ))}
@@ -1191,6 +1180,21 @@ function App() {
     <div className="app-container">
       {/* Sidebar Controls */}
       <div className="sidebar">
+        <header className="sidebar-header">
+          <div className="sidebar-title">
+            <HiroLogoMark
+              colors={colors}
+              seed={seed}
+              isBlurred={isBlurred}
+              blurStrength={blurStrength}
+              blendMode={blendMode}
+              showRing={showRing}
+              width={activeRatio.width}
+              height={activeRatio.height}
+            />
+            <span className="logo-text">Hiro</span>
+          </div>
+        </header>
 
         <div className="control-group">
           <div className="control-header">
@@ -1290,6 +1294,7 @@ function App() {
                   <button
                     key={preset.name}
                     className={`preset-btn ${isHighlighted ? 'active' : ''}`}
+                    title={preset.name}
                     onClick={() => setActivePreset(preset.name)}
                     onMouseEnter={() => setHoveredPreset(preset.name)}
                   >

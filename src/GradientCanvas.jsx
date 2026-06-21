@@ -268,13 +268,16 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
     // Reset composite operation
     ctx.globalCompositeOperation = 'source-over';
 
-    // 4. Draw Edge Ring (if enabled) as the top layer with a separate blur and plus-lighter blend mode
+    // 4. Draw Edge Ring (if enabled) as the top layer with a capped blur and source-over blend mode
     if (showRing) {
-      ctx.globalCompositeOperation = 'plus-lighter';
+      ctx.globalCompositeOperation = 'source-over';
       
-      // Apply blur filter just for the edge frame stroke
-      const ringBlurAmount = Math.max(width, height) * 0.15 * (blurStrength / 100);
-      ctx.filter = isBlurred && blurStrength > 0 ? `blur(${ringBlurAmount}px)` : 'none';
+      // Cap the blur of the edge frame (e.g. max 5% of viewport) so it remains visible even at 100% main blur
+      const maxRingBlur = Math.min(width, height) * 0.05;
+      const ringBlurAmount = isBlurred && blurStrength > 0 
+        ? Math.min(maxRingBlur, Math.max(width, height) * 0.15 * (blurStrength / 100))
+        : 0;
+      ctx.filter = ringBlurAmount > 0 ? `blur(${ringBlurAmount}px)` : 'none';
       
       ctx.strokeStyle = colors[0] || '#000000';
       

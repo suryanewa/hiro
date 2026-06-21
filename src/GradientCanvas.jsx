@@ -281,17 +281,12 @@ const GradientCanvas = forwardRef(({ colors, width, height, seed, glassIntensity
       
       ctx.strokeStyle = colors[0] || '#000000';
       
-      // Calculate a responsive line width (e.g. 12% of the canvas smaller dimension)
+      // Calculate a responsive line width (12% of the canvas smaller dimension, 6% inside / 6% outside bleed)
       const strokeThickness = Math.min(width, height) * 0.12; 
       ctx.lineWidth = strokeThickness;
       
-      // Draw strokeRect centered on the stroke line (insetting by half thickness)
-      ctx.strokeRect(
-        strokeThickness / 2, 
-        strokeThickness / 2, 
-        width - strokeThickness, 
-        height - strokeThickness
-      );
+      // Draw strokeRect centered exactly on the canvas borders (bleeding 50% outside)
+      ctx.strokeRect(0, 0, width, height);
       
       // Reset filter and composite operation after drawing
       ctx.filter = 'none';

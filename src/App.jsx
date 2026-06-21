@@ -552,12 +552,6 @@ function App() {
     <div className="app-container">
       {/* Sidebar Controls */}
       <div className="sidebar">
-        <div className="sidebar-header">
-          <h1 className="sidebar-title">
-            <img src="/favicon.svg" alt="Hiro logo" style={{ width: 22, height: 22 }} />
-            <span className="logo-text">iro</span>
-          </h1>
-        </div>
 
         <div className="control-group">
           <div className="control-header">

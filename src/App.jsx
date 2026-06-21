@@ -561,7 +561,7 @@ function App() {
 
         <div className="control-group">
           <div className="control-header">
-            <label className="control-label">Brand Colors</label>
+            <label className="control-label">Colors</label>
             <button 
               onClick={addColor} 
               className="btn-icon-add" 
@@ -598,6 +598,12 @@ function App() {
           </div>
         </div>
 
+        <TakiSwitch 
+          label="Frame"
+          checked={showRing}
+          onChange={setShowRing}
+        />
+
         <div className="control-group">
           <div className="slider-header">
             <label className="control-label" style={{ marginBottom: 0 }}>Blur Strength</label>
@@ -615,12 +621,6 @@ function App() {
             }}
           />
         </div>
-
-        <TakiSwitch 
-          label="Edge Frame"
-          checked={showRing}
-          onChange={setShowRing}
-        />
 
         <AnimatedSelect
           label="Vibrancy"

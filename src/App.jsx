@@ -411,6 +411,51 @@ const generateRandomPalette = (count, vibrancy = 'vibrant') => {
   return generatePolinePalette(count, vibrancy);
 };
 
+const hexToRgbVals = (hex) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 0, g: 0, b: 0 };
+};
+
+const calculatePaletteDistance = (pal1, pal2) => {
+  const rgb1 = pal1.map(hexToRgbVals);
+  const rgb2 = pal2.map(hexToRgbVals);
+  
+  let totalDist = 0;
+  rgb1.forEach(c1 => {
+    let minDist = Infinity;
+    rgb2.forEach(c2 => {
+      const d = Math.sqrt(Math.pow(c1.r - c2.r, 2) + Math.pow(c1.g - c2.g, 2) + Math.pow(c1.b - c2.b, 2));
+      if (d < minDist) minDist = d;
+    });
+    totalDist += minDist;
+  });
+  return totalDist / rgb1.length;
+};
+
+const generateDifferentPalette = (count, vibrancy, previousColors) => {
+  if (!previousColors || previousColors.length === 0) return generateRandomPalette(count, vibrancy);
+
+  let bestPalette = generateRandomPalette(count, vibrancy);
+  let maxDistance = -1;
+
+  for (let i = 0; i < 5; i++) {
+    const candidate = generateRandomPalette(count, vibrancy);
+    const distance = calculatePaletteDistance(candidate, previousColors);
+    if (distance > 70) {
+      return candidate;
+    }
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      bestPalette = candidate;
+    }
+  }
+  return bestPalette;
+};
+
 function TakiSlider({ value, min = 0, max = 100, step = 1, onChange }) {
   return (
     <div className="taki-slider-control">
@@ -734,7 +779,7 @@ function App() {
   const randomizePalette = () => {
     const randomVibrancy = ['vibrant', 'pastel', 'monochrome', 'neon'][Math.floor(Math.random() * 4)];
     const randomCount = Math.floor(Math.random() * 5) + 2; // Between 2 and 6 colors
-    setColors(generateRandomPalette(randomCount, randomVibrancy));
+    setColors(generateDifferentPalette(randomCount, randomVibrancy, colors));
   };
 
   const randomize = () => {
@@ -745,7 +790,7 @@ function App() {
     setVibrancy(randomVibrancy);
 
     const randomCount = Math.floor(Math.random() * 5) + 2; // Between 2 and 6 colors
-    setColors(generateRandomPalette(randomCount, randomVibrancy));
+    setColors(generateDifferentPalette(randomCount, randomVibrancy, colors));
 
     // Randomize blur strength between 50 and 75, and ensure blur is enabled
     setBlurStrength(Math.floor(Math.random() * 26) + 50);
@@ -994,7 +1039,7 @@ function App() {
           options={VIBRANCY_OPTIONS}
           onChange={(val) => {
             setVibrancy(val);
-            setColors(prevColors => generateRandomPalette(prevColors.length, val));
+            setColors(prevColors => generateDifferentPalette(prevColors.length, val, prevColors));
           }}
         />
 

@@ -8,7 +8,7 @@ export {
   PALETTE_MOOD_OPTIONS,
   RATIOS,
   VIBRANCY_OPTIONS,
-} from './constants.js';
+} from './api/constants.js';
 export {
   calculatePaletteDistance,
   generateDifferentPalette,
@@ -25,7 +25,15 @@ export {
   rgbToHex,
   rgbToHslVals,
   rgbToOklchVals,
-} from './palettes.js';
+} from './api/palettes.js';
+export { createSeededRandom, randomChoice, randomInt, shuffleArray, withMathRandom } from './api/random.js';
+export {
+  SHADER_OPTIONS,
+  SHADER_PRESETS,
+  getShaderPreset,
+  listShaderPresetMetadata,
+  pickRandomShaderSelection,
+} from './api/shaders.js';
 export {
   createGradientConfig,
   createGradientHtml,
@@ -33,14 +41,7 @@ export {
   createRandomGradientConfig,
   listGradientMetadata,
   renderGradientAsSvg,
-} from './gradients.js';
-export {
-  SHADER_OPTIONS,
-  SHADER_PRESETS,
-  getShaderPreset,
-  listShaderPresetMetadata,
-  pickRandomShaderSelection,
-} from './shaders.js';
+} from './api/gradients.js';
 export {
   ApiValidationError,
   isHexColor,
@@ -48,5 +49,5 @@ export {
   normalizeHexColor,
   validatePaletteMood,
   validateVibrancy,
-} from './validation.js';
-export { buildOpenApiSpec } from './openapi.js';
+} from './api/validation.js';
+export { buildOpenApiSpec } from './api/openapi.js';

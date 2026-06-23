@@ -1,23 +1,24 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  PaperTexture, paperTexturePresets,
-  FlutedGlass, flutedGlassPresets,
-  Water, waterPresets,
-  ImageDithering, imageDitheringPresets,
-  HalftoneDots, halftoneDotsPresets,
-  HalftoneCmyk, halftoneCmykPresets
+  PaperTexture,
+  FlutedGlass,
+  Water,
+  ImageDithering,
+  HalftoneDots,
+  HalftoneCmyk
 } from '@paper-design/shaders-react';
+import { SHADER_PRESETS } from './api/shaders.js';
 
 const RATIO_TRANSITION = { type: 'spring', stiffness: 380, damping: 32 };
 
 const SHADER_COMPONENTS = {
-  'paper-texture': { Component: PaperTexture, presets: paperTexturePresets.filter(p => p.name !== 'Cardboard' && p.name !== 'Details') },
-  'fluted-glass': { Component: FlutedGlass, presets: flutedGlassPresets.filter(p => p.name !== 'Abstract' && p.name !== 'Folds') },
-  'water': { Component: Water, presets: waterPresets.filter(p => p.name !== 'Slow-mo' && p.name !== 'Abstract') },
-  'image-dithering': { Component: ImageDithering, presets: imageDitheringPresets.filter(p => p.name !== 'Default' && p.name !== 'Noise' && p.name !== 'Retro') },
-  'halftone-dots': { Component: HalftoneDots, presets: halftoneDotsPresets.filter(p => p.name !== 'Default' && p.name !== 'LED screen' && p.name !== 'Round and square') },
-  'halftone-cmyk': { Component: HalftoneCmyk, presets: halftoneCmykPresets.filter(p => p.name !== 'Newspaper' && p.name !== 'Drops' && p.name !== 'Vintage') }
+  'paper-texture': { Component: PaperTexture, presets: SHADER_PRESETS['paper-texture'] },
+  'fluted-glass': { Component: FlutedGlass, presets: SHADER_PRESETS['fluted-glass'] },
+  'water': { Component: Water, presets: SHADER_PRESETS.water },
+  'image-dithering': { Component: ImageDithering, presets: SHADER_PRESETS['image-dithering'] },
+  'halftone-dots': { Component: HalftoneDots, presets: SHADER_PRESETS['halftone-dots'] },
+  'halftone-cmyk': { Component: HalftoneCmyk, presets: SHADER_PRESETS['halftone-cmyk'] }
 };
 
 const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, height, zoom = 1, containerHeight }, ref) => {

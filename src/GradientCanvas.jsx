@@ -1,7 +1,7 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { motion } from 'framer-motion';
 import { renderGradient } from './gradientRenderer';
-import { renderGradientToDataUrl } from './exportBackground';
+import { renderGradientToDataUrl } from './browserCanvas';
 
 const RATIO_TRANSITION = { type: 'spring', stiffness: 380, damping: 32 };
 const RAPID_PREVIEW_MAX_DIMENSION = 960;

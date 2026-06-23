@@ -395,6 +395,27 @@ test('selects export image data without silently dropping shaders', () => {
   );
 });
 
+test('separates package exports for universal, Node, and browser consumers', async () => {
+  const core = await import('@suryanewa/hiro');
+  const node = await import('@suryanewa/hiro/node');
+  const browser = await import('@suryanewa/hiro/browser');
+
+  assert.equal(typeof core.createRandomGradientConfig, 'function');
+  assert.equal(typeof core.renderGradientAsSvg, 'function');
+  assert.equal(core.renderGradient, undefined);
+  assert.equal(core.renderGradientToDataUrl, undefined);
+  assert.equal(core.createApiServer, undefined);
+
+  assert.equal(typeof node.createApiServer, 'function');
+  assert.equal(typeof node.createGradientHtml, 'function');
+  assert.equal(node.renderGradient, undefined);
+  assert.equal(node.renderGradientToDataUrl, undefined);
+
+  assert.equal(typeof browser.renderGradient, 'function');
+  assert.equal(typeof browser.renderGradientToDataUrl, 'function');
+  assert.equal(browser.createApiServer, undefined);
+});
+
 test('exposes metadata', () => {
   const metadata = listGradientMetadata();
   assert.equal(metadata.name, 'gradients');

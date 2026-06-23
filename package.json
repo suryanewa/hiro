@@ -1,8 +1,48 @@
 {
-  "name": "gradients",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@suryanewa/hiro",
+  "version": "0.1.0",
+  "description": "Parametric Hiro gradient generation, SVG rendering, and browser canvas helpers.",
   "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    },
+    "./browser": {
+      "browser": "./src/browser.js",
+      "import": "./src/browser.js",
+      "default": "./src/browser.js"
+    },
+    "./node": {
+      "node": "./src/node.js",
+      "import": "./src/node.js",
+      "default": "./src/node.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "api",
+    "src/api",
+    "src/browser.js",
+    "src/browserCanvas.js",
+    "src/exportGuards.js",
+    "src/gradientRenderer.js",
+    "src/index.js",
+    "src/node.js",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "gradient",
+    "svg",
+    "canvas",
+    "generative",
+    "hiro"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
@@ -16,28 +56,28 @@
     "test:api": "node --test test/api.test.js"
   },
   "dependencies": {
-    "@base-ui/react": "^1.6.0",
-    "@paper-design/shaders-react": "^0.0.76",
     "fettepalette": "^3.3.0",
-    "fflate": "^0.8.3",
-    "framer-motion": "^12.40.0",
-    "lucide-react": "^1.21.0",
     "poline": "^0.13.1",
     "rampensau": "^2.3.0",
-    "react": "^19.2.6",
-    "react-aria-components": "^1.19.0",
-    "react-dom": "^19.2.6",
     "rybitten": "^1.2.0"
   },
   "devDependencies": {
+    "@base-ui/react": "^1.6.0",
     "@eslint/js": "^10.0.1",
+    "@paper-design/shaders-react": "^0.0.76",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "fflate": "^0.8.3",
+    "framer-motion": "^12.40.0",
     "globals": "^17.6.0",
+    "lucide-react": "^1.21.0",
+    "react": "^19.2.6",
+    "react-aria-components": "^1.19.0",
+    "react-dom": "^19.2.6",
     "vite": "^8.0.12"
   }
 }

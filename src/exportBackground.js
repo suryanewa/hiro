@@ -1,5 +1,6 @@
 import { zipSync } from 'fflate';
 import { buildReactShaderSnippet, generateReplicationHtml } from './api/snippets.js';
+import { renderGradientToDataUrl } from './browserCanvas.js';
 import {
   assertExportDimensions,
   dataUrlToBytes,
@@ -7,28 +8,7 @@ import {
   sanitizeExportSlug,
   selectExportImageDataUrl,
 } from './exportGuards.js';
-import { renderGradient } from './gradientRenderer';
 import gradientRendererSource from './gradientRenderer.js?raw';
-
-export function renderGradientToDataUrl(options) {
-  assertExportDimensions(options);
-
-  const canvas = document.createElement('canvas');
-  canvas.width = options.width;
-  canvas.height = options.height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    throw new ExportError('canvas_unavailable', 'Canvas rendering is unavailable in this browser.');
-  }
-
-  renderGradient(ctx, options);
-
-  try {
-    return canvas.toDataURL('image/png');
-  } catch {
-    throw new ExportError('canvas_export_failed', 'Canvas export failed.');
-  }
-}
 
 function textToBytes(text) {
   return new TextEncoder().encode(text);

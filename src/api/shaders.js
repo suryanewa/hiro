@@ -1,12 +1,5 @@
-import {
-  paperTexturePresets,
-  flutedGlassPresets,
-  waterPresets,
-  imageDitheringPresets,
-  halftoneDotsPresets,
-  halftoneCmykPresets,
-} from '@paper-design/shaders-react';
 import { randomChoice } from './random.js';
+import { SHADER_PRESETS } from './shaderPresets.js';
 
 export const SHADER_OPTIONS = Object.freeze([
   { label: 'None', value: 'none' },
@@ -17,15 +10,6 @@ export const SHADER_OPTIONS = Object.freeze([
   { label: 'Halftone Dots', value: 'halftone-dots' },
   { label: 'Halftone CMYK', value: 'halftone-cmyk' },
 ]);
-
-export const SHADER_PRESETS = Object.freeze({
-  'paper-texture': paperTexturePresets.filter((p) => p.name !== 'Cardboard' && p.name !== 'Details' && p.name !== 'Abstract'),
-  'fluted-glass': flutedGlassPresets.filter((p) => p.name !== 'Abstract' && p.name !== 'Folds'),
-  water: waterPresets.filter((p) => p.name !== 'Slow-mo' && p.name !== 'Abstract'),
-  'image-dithering': imageDitheringPresets.filter((p) => p.name !== 'Default' && p.name !== 'Noise' && p.name !== 'Retro'),
-  'halftone-dots': halftoneDotsPresets.filter((p) => p.name !== 'Default' && p.name !== 'LED screen' && p.name !== 'Round and square'),
-  'halftone-cmyk': halftoneCmykPresets.filter((p) => p.name !== 'Newspaper' && p.name !== 'Drops' && p.name !== 'Vintage'),
-});
 
 export const SHADER_VALUES = Object.freeze(SHADER_OPTIONS.map((option) => option.value));
 
@@ -64,3 +48,5 @@ export function pickRandomShaderSelection(random = Math.random, { includeNone = 
     presetParams: preset?.params ?? {},
   };
 }
+
+export { SHADER_PRESETS };

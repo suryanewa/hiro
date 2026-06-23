@@ -1,6 +1,6 @@
 # Hiro Gradients
 
-Hiro Gradients is a parametric background generator for creating polished gradient images, shader-backed previews, export bundles, and API-rendered SVGs. The project includes a React design tool, a reusable JavaScript API, and a lightweight Node HTTP API built on the same core gradient configuration.
+Hiro Gradients is a parametric background generator for creating polished gradient images, shader-backed previews, export bundles, and API-rendered SVGs. The project includes a React design tool, the `@suryanewa/hiro` JavaScript library, and a lightweight Node HTTP API built on the same core gradient configuration.
 
 ## Screenshots
 
@@ -107,9 +107,17 @@ The canvas renderer uses this shared config shape:
 }
 ```
 
-## JavaScript API
+## NPM Library
 
-Import from `src/api/index.js` when using the local project as a library:
+The reusable library package is named `@suryanewa/hiro` and exposes separate universal, Node, and browser entrypoints.
+
+```sh
+npm install @suryanewa/hiro
+```
+
+### Universal API
+
+Use the package root for config creation, validation, metadata, snippets, OpenAPI, and server-safe SVG/HTML generation:
 
 ```js
 import {
@@ -117,7 +125,7 @@ import {
   createRandomGradientConfig,
   listGradientMetadata,
   renderGradientAsSvg,
-} from './src/api/index.js';
+} from '@suryanewa/hiro';
 
 const config = createRandomGradientConfig({
   seed: 'launch',
@@ -132,13 +140,15 @@ const svg = renderGradientAsSvg(normalized);
 const metadata = listGradientMetadata();
 ```
 
-The browser canvas renderer is also exported directly:
+### Browser API
+
+Use `@suryanewa/hiro/browser` for canvas rendering and browser data-URL helpers. This entrypoint is browser-oriented and intentionally separate from the package root.
 
 ```js
-import { renderGradient } from './src/gradientRenderer.js';
+import { renderGradient, renderGradientToDataUrl } from '@suryanewa/hiro/browser';
 
 const canvas = document.querySelector('canvas');
-renderGradient(canvas.getContext('2d'), {
+const config = {
   colors: ['#0f172a', '#3b82f6', '#8b5cf6'],
   width: canvas.width,
   height: canvas.height,
@@ -147,7 +157,23 @@ renderGradient(canvas.getContext('2d'), {
   blurStrength: 80,
   blendMode: 'dynamic',
   showRing: false,
-});
+};
+
+renderGradient(canvas.getContext('2d'), config);
+const pngDataUrl = renderGradientToDataUrl(config);
+```
+
+### Node API
+
+Use `@suryanewa/hiro/node` for Node-only adapters such as the HTTP server. This entrypoint imports Node built-ins and is not intended for browser bundles.
+
+```js
+import { createApiServer, createRandomGradientConfig } from '@suryanewa/hiro/node';
+
+const server = createApiServer();
+server.listen(8787, '127.0.0.1');
+
+const config = createRandomGradientConfig({ seed: 'api', includeShader: false });
 ```
 
 ### Public API Modules
@@ -161,6 +187,8 @@ renderGradient(canvas.getContext('2d'), {
 - `snippets.js` - standalone HTML and React shader snippet generation.
 - `openapi.js` - OpenAPI 3.1 document builder.
 - `gradients.js` - high-level public API facade.
+
+The package root and Node entrypoint do not export `renderGradient`, `renderGradientToDataUrl`, React components, `src/exportBackground.js`, or Vite-only `?raw` imports. Browser canvas rendering lives behind `@suryanewa/hiro/browser`.
 
 ## HTTP API
 

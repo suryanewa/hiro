@@ -193,6 +193,23 @@ function HexPicker({ value, onChange }) {
   );
 }
 
+function LockableLabel({ children, locked, onToggle }) {
+  return (
+    <button
+      type="button"
+      className={`control-label lockable-label${locked ? ' locked' : ''}`}
+      aria-pressed={locked}
+      title={locked ? `${children} locked for remix` : `Lock ${children} for remix`}
+      onPointerDown={(e) => {
+        e.preventDefault();
+      }}
+      onClick={onToggle}
+    >
+      {children}
+    </button>
+  );
+}
+
 function AnimatedSelect({ label, value, options, onChange }) {
   const [open, setOpen] = useState(false);
   const selectedLabel = options.find(o => o.value === value)?.label || value;
@@ -200,7 +217,7 @@ function AnimatedSelect({ label, value, options, onChange }) {
   return (
     <div className="animated-select">
       <div className="setting-row">
-        <label className="control-label">{label}</label>
+        {typeof label === 'string' ? <label className="control-label">{label}</label> : label}
         <div className="animated-select-trigger-wrap">
           <button
             type="button"
@@ -283,6 +300,7 @@ function App() {
   const [isBlurScrubbing, setIsBlurScrubbing] = useState(false);
   const [isShaderHandoffPending, setIsShaderHandoffPending] = useState(false);
   const [renderGeneration, setRenderGeneration] = useState(0);
+  const [lockedParams, setLockedParams] = useState({});
   
   const canvasRef = useRef(null);
   const shaderRef = useRef(null);
@@ -365,10 +383,29 @@ function App() {
   const pendingShaderHandoffGenerationRef = useRef(0);
   const colorsRef = useRef(colors);
   const activeShaderRef = useRef(activeShader);
+  const activePresetRef = useRef(activePreset);
+  const blurStrengthRef = useRef(blurStrength);
+  const isBlurredRef = useRef(isBlurred);
+  const vibrancyRef = useRef(vibrancy);
+  const blendModeRef = useRef(blendMode);
+  const lockedParamsRef = useRef(lockedParams);
   colorsRef.current = colors;
   isRapidRandomizingRef.current = isRapidRandomizing;
   renderGenerationRef.current = renderGeneration;
   activeShaderRef.current = activeShader;
+  activePresetRef.current = activePreset;
+  blurStrengthRef.current = blurStrength;
+  isBlurredRef.current = isBlurred;
+  vibrancyRef.current = vibrancy;
+  blendModeRef.current = blendMode;
+  lockedParamsRef.current = lockedParams;
+
+  const toggleParamLock = useCallback((param) => {
+    setLockedParams((prev) => ({
+      ...prev,
+      [param]: !prev[param],
+    }));
+  }, []);
 
   const completeShaderHandoff = useCallback((generation) => {
     requestAnimationFrame(() => {
@@ -427,11 +464,21 @@ function App() {
       }
     }
 
-    const randomVibrancy = VIBRANCY_OPTIONS[Math.floor(Math.random() * VIBRANCY_OPTIONS.length)].value;
-    const prevColors = fast ? undefined : colorsRef.current;
+    const locks = lockedParamsRef.current;
+    const randomVibrancy = locks.vibrancy
+      ? vibrancyRef.current
+      : VIBRANCY_OPTIONS[Math.floor(Math.random() * VIBRANCY_OPTIONS.length)].value;
+    const prevColors = fast || locks.colors ? undefined : colorsRef.current;
     const nextConfig = createRandomGradientConfig({
       vibrancy: randomVibrancy,
       previousColors: prevColors,
+      colors: locks.colors ? colorsRef.current : undefined,
+      blurStrength: locks.blurStrength ? blurStrengthRef.current : undefined,
+      isBlurred: locks.blurStrength ? isBlurredRef.current : undefined,
+      blendMode: locks.blendMode ? blendModeRef.current : undefined,
+      activeShader: locks.shader ? activeShaderRef.current : undefined,
+      activePreset: locks.shader ? activePresetRef.current : undefined,
+      includeShader: locks.shader ? false : undefined,
     });
 
     setColors(nextConfig.colors);
@@ -723,7 +770,9 @@ function App() {
 
         <div className="control-group">
           <div className="control-header">
-            <label className="control-label">Colors</label>
+            <LockableLabel locked={!!lockedParams.colors} onToggle={() => toggleParamLock('colors')}>
+              Colors
+            </LockableLabel>
             <button 
               onClick={addColor} 
               className="btn-icon-add" 
@@ -768,7 +817,9 @@ function App() {
 
         <div className="control-group">
           <div className="slider-header">
-            <label className="control-label" style={{ marginBottom: 0 }}>Blur Strength</label>
+            <LockableLabel locked={!!lockedParams.blurStrength} onToggle={() => toggleParamLock('blurStrength')}>
+              Blur Strength
+            </LockableLabel>
             <span className="slider-value">{blurStrength}%</span>
           </div>
           <TakiSlider 
@@ -787,7 +838,11 @@ function App() {
         </div>
 
         <AnimatedSelect
-          label="Vibrancy"
+          label={(
+            <LockableLabel locked={!!lockedParams.vibrancy} onToggle={() => toggleParamLock('vibrancy')}>
+              Vibrancy
+            </LockableLabel>
+          )}
           value={vibrancy}
           options={VIBRANCY_OPTIONS}
           onChange={(val) => {
@@ -797,7 +852,11 @@ function App() {
         />
 
         <AnimatedSelect
-          label="Blend Mode"
+          label={(
+            <LockableLabel locked={!!lockedParams.blendMode} onToggle={() => toggleParamLock('blendMode')}>
+              Blend Mode
+            </LockableLabel>
+          )}
           value={blendMode}
           options={BLEND_MODES}
           onChange={(val) => setBlendMode(val)}
@@ -805,7 +864,11 @@ function App() {
 
         <div className="control-group">
           <AnimatedSelect
-            label="Shader"
+            label={(
+              <LockableLabel locked={!!lockedParams.shader} onToggle={() => toggleParamLock('shader')}>
+                Shader
+              </LockableLabel>
+            )}
             value={activeShader}
             options={SHADER_OPTIONS}
             onChange={(val) => handleShaderChange(val)}

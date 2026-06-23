@@ -253,6 +253,31 @@ body {
   line-height: 1;
 }
 
+.lockable-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.18s var(--ease-standard), opacity 0.18s var(--ease-standard);
+}
+
+.lockable-label:hover {
+  color: var(--accent-hover);
+}
+
+.lockable-label.locked {
+  color: var(--text-muted);
+  opacity: 0.62;
+}
+
+.lockable-label.locked:hover {
+  opacity: 0.82;
+}
+
 .control-header {
   display: flex;
   justify-content: space-between;

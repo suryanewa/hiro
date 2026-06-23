@@ -10,6 +10,13 @@ import {
   normalizeGradientConfig,
   renderGradientAsSvg,
 } from '../src/api/index.js';
+import {
+  dataUrlToBytes,
+  ExportError,
+  sanitizeExportSlug,
+  selectExportImageDataUrl,
+  validateExportDimensions,
+} from '../src/exportGuards.js';
 
 function listen(server) {
   return new Promise((resolve) => {
@@ -119,6 +126,22 @@ test('renders gradients as SVG and creates standalone HTML', () => {
   assert.match(html, /renderGradient/);
 });
 
+test('renders SVG blur filters and blend modes for richer configs', () => {
+  const svg = renderGradientAsSvg({
+    colors: ['#0f172a', '#3b82f6', '#8b5cf6'],
+    width: 320,
+    height: 180,
+    seed: 0.5,
+    isBlurred: true,
+    blurStrength: 60,
+    blendMode: 'screen',
+  });
+
+  assert.match(svg, /<filter id="hiro-blur-/);
+  assert.match(svg, /<feGaussianBlur/);
+  assert.match(svg, /mix-blend-mode:screen/);
+});
+
 test('escapes generated HTML metadata', () => {
   const html = createGradientHtml({
     colors: ['#0f172a', '#3b82f6'],
@@ -133,6 +156,55 @@ test('escapes generated HTML metadata', () => {
   assert.match(html, /paper-texture \(Default &lt;em data-x=&quot;preset&quot;&gt;Preset&lt;\/em&gt;\)/);
   assert.doesNotMatch(html, /<strong data-x="ratio">/);
   assert.doesNotMatch(html, /<em data-x="preset">/);
+});
+
+test('validates export dimensions and data URLs', () => {
+  assert.deepEqual(validateExportDimensions({ width: 1920, height: 1080 }), {
+    valid: true,
+    errors: [],
+  });
+  assert.equal(validateExportDimensions({ width: 0, height: 1080 }).valid, false);
+  assert.equal(validateExportDimensions({ width: 1920.5, height: 1080 }).valid, false);
+
+  assert.equal(sanitizeExportSlug('16:9 <Hero>'), '16x9-hero');
+
+  const bytes = dataUrlToBytes('data:image/png;base64,SGlybw==');
+  assert.deepEqual([...bytes], [72, 105, 114, 111]);
+
+  assert.throws(
+    () => dataUrlToBytes('data:image/jpeg;base64,SGlybw=='),
+    (error) => error instanceof ExportError && error.code === 'invalid_data_url_type',
+  );
+  assert.throws(
+    () => dataUrlToBytes('not-a-data-url'),
+    (error) => error instanceof ExportError && error.code === 'invalid_data_url',
+  );
+});
+
+test('selects export image data without silently dropping shaders', () => {
+  assert.equal(selectExportImageDataUrl({
+    hasShader: false,
+    displayedDataUrl: null,
+    renderedDataUrl: 'data:image/png;base64,cmVuZGVyZWQ=',
+    fallbackDataUrl: 'data:image/png;base64,ZmFsbGJhY2s=',
+  }), 'data:image/png;base64,cmVuZGVyZWQ=');
+
+  assert.equal(selectExportImageDataUrl({
+    hasShader: true,
+    displayedDataUrl: 'data:image/png;base64,c2hhZGVy',
+    renderedDataUrl: 'data:image/png;base64,cmVuZGVyZWQ=',
+    fallbackDataUrl: null,
+  }), 'data:image/png;base64,c2hhZGVy');
+
+  assert.throws(
+    () => selectExportImageDataUrl({
+      hasShader: true,
+      displayedDataUrl: null,
+      renderedDataUrl: 'data:image/png;base64,cmVuZGVyZWQ=',
+      fallbackDataUrl: 'data:image/png;base64,ZmFsbGJhY2s=',
+    }),
+    (error) => error instanceof ExportError && error.code === 'shader_capture_unavailable',
+  );
 });
 
 test('exposes metadata', () => {

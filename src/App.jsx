@@ -675,7 +675,7 @@ function App() {
       ? SHADER_PRESETS[activeShader]?.find((p) => p.name === activePreset)
       : null;
 
-    exportBackground({
+    const result = exportBackground({
       colors,
       seed,
       width: activeRatio.width,
@@ -691,6 +691,10 @@ function App() {
       gradientDataUrl,
       getDisplayedDataUrl: () => activeRef.current?.exportToDataURL?.() ?? null,
     });
+
+    if (!result.ok) {
+      window.alert(result.error?.message ?? 'Export failed.');
+    }
   };
 
   const highlightedRatio = hoveredRatio !== null ? hoveredRatio : activeRatio.label;

@@ -29,6 +29,7 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
       const element = shaderElementRef.current;
       const sourceCanvas = element?.paperShaderMount?.canvasElement;
       if (!sourceCanvas) return null;
+      if (!sourceCanvas.width || !sourceCanvas.height) return null;
 
       const exportCanvas = document.createElement('canvas');
       exportCanvas.width = width;
@@ -36,8 +37,12 @@ const ShaderPreview = forwardRef(({ shaderType, presetName, imageUrl, width, hei
       const ctx = exportCanvas.getContext('2d');
       if (!ctx) return null;
 
-      ctx.drawImage(sourceCanvas, 0, 0, width, height);
-      return exportCanvas.toDataURL('image/png');
+      try {
+        ctx.drawImage(sourceCanvas, 0, 0, width, height);
+        return exportCanvas.toDataURL('image/png');
+      } catch {
+        return null;
+      }
     }
   }), [width, height]);
 

@@ -1,26 +1,33 @@
 import { zipSync } from 'fflate';
 import { buildReactShaderSnippet, generateReplicationHtml } from './api/snippets.js';
+import {
+  assertExportDimensions,
+  dataUrlToBytes,
+  ExportError,
+  sanitizeExportSlug,
+  selectExportImageDataUrl,
+} from './exportGuards.js';
 import { renderGradient } from './gradientRenderer';
 import gradientRendererSource from './gradientRenderer.js?raw';
 
 export function renderGradientToDataUrl(options) {
+  assertExportDimensions(options);
+
   const canvas = document.createElement('canvas');
   canvas.width = options.width;
   canvas.height = options.height;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-  renderGradient(ctx, options);
-  return canvas.toDataURL('image/png');
-}
-
-function dataUrlToBytes(dataUrl) {
-  const base64 = dataUrl.split(',')[1];
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
+  if (!ctx) {
+    throw new ExportError('canvas_unavailable', 'Canvas rendering is unavailable in this browser.');
   }
-  return bytes;
+
+  renderGradient(ctx, options);
+
+  try {
+    return canvas.toDataURL('image/png');
+  } catch {
+    throw new ExportError('canvas_export_failed', 'Canvas export failed.');
+  }
 }
 
 function textToBytes(text) {
@@ -39,7 +46,7 @@ function downloadBlob(blob, filename) {
 }
 
 export function buildExportBaseName(ratioLabel) {
-  const ratioSlug = ratioLabel.replace(':', 'x').toLowerCase();
+  const ratioSlug = sanitizeExportSlug(ratioLabel);
   return `hiro-${ratioSlug}-${Date.now()}`;
 }
 
@@ -94,84 +101,102 @@ export function exportBackground({
   getDisplayedDataUrl,
   gradientDataUrl,
 }) {
-  const baseName = buildExportBaseName(ratioLabel);
-  const pngFilename = `${baseName}.png`;
-  const htmlFilename = `${baseName}.html`;
-  const hasShader = activeShader && activeShader !== 'none';
+  try {
+    assertExportDimensions({ width, height });
 
-  let pngDataUrl = getDisplayedDataUrl?.() ?? null;
+    const baseName = buildExportBaseName(ratioLabel);
+    const pngFilename = `${baseName}.png`;
+    const htmlFilename = `${baseName}.html`;
+    const hasShader = activeShader && activeShader !== 'none';
 
-  if (!pngDataUrl) {
-    pngDataUrl = renderGradientToDataUrl({
-      colors,
-      width,
-      height,
-      seed,
-      isBlurred,
-      blurStrength,
-      blendMode,
-      showRing,
-    });
-  }
+    const displayedDataUrl = getDisplayedDataUrl?.() ?? null;
+    let renderedDataUrl = null;
 
-  if (!pngDataUrl && gradientDataUrl) {
-    pngDataUrl = gradientDataUrl;
-  }
-
-  if (!pngDataUrl) return false;
-
-  const html = generateReplicationHtml({
-    colors,
-    seed,
-    width,
-    height,
-    ratioLabel,
-    isBlurred,
-    blurStrength,
-    blendMode,
-    showRing,
-    activeShader,
-    activePreset,
-    presetParams,
-    pngFilename,
-    pngDataUrl,
-  }, { rendererSource: gradientRendererSource });
-
-  const zipEntries = {
-    [pngFilename]: dataUrlToBytes(pngDataUrl),
-    [htmlFilename]: textToBytes(html),
-    'README.txt': textToBytes(buildReadme({
-      ratioLabel,
-      width,
-      height,
-      activeShader,
-      activePreset,
-      pngFilename,
-      htmlFilename,
-    })),
-  };
-
-  if (hasShader) {
-    zipEntries['gradientRenderer.js'] = textToBytes(gradientRendererSource);
-    zipEntries['GradientBackground.jsx'] = textToBytes(
-      buildReactShaderSnippet({
+    if (!displayedDataUrl && !hasShader) {
+      renderedDataUrl = renderGradientToDataUrl({
         colors,
-        seed,
         width,
         height,
+        seed,
         isBlurred,
         blurStrength,
         blendMode,
         showRing,
+      });
+    }
+
+    const pngDataUrl = selectExportImageDataUrl({
+      hasShader,
+      displayedDataUrl,
+      renderedDataUrl,
+      fallbackDataUrl: gradientDataUrl,
+    });
+
+    if (!pngDataUrl) {
+      throw new ExportError('export_unavailable', 'No exportable image data was produced.');
+    }
+
+    const html = generateReplicationHtml({
+      colors,
+      seed,
+      width,
+      height,
+      ratioLabel,
+      isBlurred,
+      blurStrength,
+      blendMode,
+      showRing,
+      activeShader,
+      activePreset,
+      pngFilename,
+      pngDataUrl,
+    }, { rendererSource: gradientRendererSource });
+
+    const zipEntries = {
+      [pngFilename]: dataUrlToBytes(pngDataUrl),
+      [htmlFilename]: textToBytes(html),
+      'README.txt': textToBytes(buildReadme({
+        ratioLabel,
+        width,
+        height,
         activeShader,
         activePreset,
-        presetParams: presetParams || {},
-      })
-    );
+        pngFilename,
+        htmlFilename,
+      })),
+    };
+
+    if (hasShader) {
+      zipEntries['gradientRenderer.js'] = textToBytes(gradientRendererSource);
+      zipEntries['GradientBackground.jsx'] = textToBytes(
+        buildReactShaderSnippet({
+          colors,
+          seed,
+          width,
+          height,
+          isBlurred,
+          blurStrength,
+          blendMode,
+          showRing,
+          activeShader,
+          activePreset,
+          presetParams: presetParams || {},
+        })
+      );
+    }
+
+    const zipped = zipSync(zipEntries);
+    downloadBlob(new Blob([zipped], { type: 'application/zip' }), `${baseName}.zip`);
+
+    return { ok: true, filename: `${baseName}.zip` };
+  } catch (error) {
+    const exportError = error instanceof Error
+      ? error
+      : new ExportError('export_failed', 'Export failed.');
+
+    return {
+      ok: false,
+      error: exportError,
+    };
   }
-
-  const zipped = zipSync(zipEntries);
-  downloadBlob(new Blob([zipped], { type: 'application/zip' }), `${baseName}.zip`);
-
-  return true;
 }

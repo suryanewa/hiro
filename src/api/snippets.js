@@ -93,6 +93,7 @@ const CONFIG = ${JSON.stringify({
     blurStrength: config.blurStrength,
     blendMode: config.blendMode,
     showRing: config.showRing,
+    frameThickness: config.frameThickness,
     width,
     height,
   }, null, 2)};
@@ -152,6 +153,7 @@ export function generateReplicationHtml(config, { rendererSource } = {}) {
     blurStrength,
     blendMode,
     showRing,
+    frameThickness,
     activeShader,
     activePreset,
     pngFilename = 'hiro-gradient.png',
@@ -165,6 +167,7 @@ export function generateReplicationHtml(config, { rendererSource } = {}) {
     blurStrength,
     blendMode,
     showRing,
+    frameThickness,
   };
   const hasShader = activeShader && activeShader !== 'none';
   const shaderLabel = hasShader

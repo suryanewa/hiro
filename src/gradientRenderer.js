@@ -282,11 +282,13 @@ export function renderGradient(ctx, {
   blurStrength = 100,
   blendMode = 'dynamic',
   showRing = false,
+  frameThickness = 12,
 }) {
   const safeWidth = Math.max(1, Math.round(numberOrFallback(width, 1)));
   const safeHeight = Math.max(1, Math.round(numberOrFallback(height, 1)));
   const safeColors = Array.isArray(colors) && colors.length > 0 ? colors : ['#000000'];
   const safeBlurStrength = clamp(numberOrFallback(blurStrength, 100), 0, 100);
+  const safeFrameThickness = clamp(numberOrFallback(frameThickness, 12), 2, 24);
   const random = createRandom(seed);
   const baseDim = Math.max(safeWidth, safeHeight);
   const motifs = [drawRibbon, drawVeil, drawBloom, drawArch, drawFacet];
@@ -361,7 +363,7 @@ export function renderGradient(ctx, {
     ctx.filter = ringBlurAmount > 0 ? `blur(${ringBlurAmount}px)` : 'none';
 
     ctx.strokeStyle = safeColors[0] || '#000000';
-    ctx.lineWidth = Math.min(safeWidth, safeHeight) * 0.12;
+    ctx.lineWidth = Math.min(safeWidth, safeHeight) * (safeFrameThickness / 100);
     ctx.strokeRect(0, 0, safeWidth, safeHeight);
 
     ctx.filter = 'none';

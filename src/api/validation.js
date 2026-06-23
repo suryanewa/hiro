@@ -194,6 +194,9 @@ export function normalizeGradientConfig(input = {}) {
   const blurStrength = typeof source.blurStrength === 'undefined'
     ? DEFAULT_GRADIENT_CONFIG.blurStrength
     : parseNumber(source.blurStrength, 'blurStrength', errors);
+  const frameThickness = typeof source.frameThickness === 'undefined'
+    ? DEFAULT_GRADIENT_CONFIG.frameThickness
+    : parseNumber(source.frameThickness, 'frameThickness', errors);
   const blendMode = source.blendMode ?? DEFAULT_GRADIENT_CONFIG.blendMode;
 
   if (!isPlainObject(input)) {
@@ -218,6 +221,13 @@ export function normalizeGradientConfig(input = {}) {
     });
   }
 
+  if (frameThickness !== null && (frameThickness < LIMITS.minFrameThickness || frameThickness > LIMITS.maxFrameThickness)) {
+    errors.push({
+      field: 'frameThickness',
+      message: `frameThickness must be between ${LIMITS.minFrameThickness} and ${LIMITS.maxFrameThickness}.`,
+    });
+  }
+
   const shader = normalizeShader(source, errors);
   const width = normalizeDimension(source, 'width', fallbackWidth, errors);
   const height = normalizeDimension(source, 'height', fallbackHeight, errors);
@@ -233,6 +243,9 @@ export function normalizeGradientConfig(input = {}) {
       : clampNumber(blurStrength, LIMITS.minBlurStrength, LIMITS.maxBlurStrength),
     blendMode: BLEND_MODE_VALUES.has(blendMode) ? blendMode : DEFAULT_GRADIENT_CONFIG.blendMode,
     showRing: parseBoolean(source.showRing, 'showRing', errors, DEFAULT_GRADIENT_CONFIG.showRing),
+    frameThickness: frameThickness === null
+      ? DEFAULT_GRADIENT_CONFIG.frameThickness
+      : clampNumber(frameThickness, LIMITS.minFrameThickness, LIMITS.maxFrameThickness),
     ...shader,
   };
 

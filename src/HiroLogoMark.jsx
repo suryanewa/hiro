@@ -74,6 +74,7 @@ export default function HiroLogoMark({
   blurStrength,
   blendMode,
   showRing,
+  frameThickness,
   width,
   height,
 }) {
@@ -89,6 +90,7 @@ export default function HiroLogoMark({
     blurStrength,
     blendMode,
     showRing,
+    frameThickness,
     width,
     height,
   };
@@ -116,6 +118,7 @@ export default function HiroLogoMark({
         blurStrength: params.blurStrength,
         blendMode: params.blendMode,
         showRing: params.showRing,
+        frameThickness: params.frameThickness,
       });
 
       const region = getSliceRegion(renderWidth, renderHeight, LOGO_ASPECT);
@@ -139,7 +142,7 @@ export default function HiroLogoMark({
         cancelAnimationFrame(frameRef.current);
       }
     };
-  }, [colors, seed, isBlurred, blurStrength, blendMode, showRing, width, height]);
+  }, [colors, seed, isBlurred, blurStrength, blendMode, showRing, frameThickness, width, height]);
 
   return (
     <svg className="sidebar-logo" viewBox={LOGO_VIEWBOX} aria-hidden="true">

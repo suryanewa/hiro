@@ -27,6 +27,7 @@ import { exportBackground } from './exportBackground';
 import {
   BLEND_MODES,
   DEFAULT_COLORS,
+  LIMITS,
   RATIOS,
   SHADER_OPTIONS,
   SHADER_PRESETS,
@@ -296,6 +297,7 @@ function App() {
   const [gradientDataUrl, setGradientDataUrl] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [showRing, setShowRing] = useState(false);
+  const [frameThickness, setFrameThickness] = useState(12);
   const [isRapidRandomizing, setIsRapidRandomizing] = useState(false);
   const [isBlurScrubbing, setIsBlurScrubbing] = useState(false);
   const [isShaderHandoffPending, setIsShaderHandoffPending] = useState(false);
@@ -385,6 +387,7 @@ function App() {
   const activeShaderRef = useRef(activeShader);
   const activePresetRef = useRef(activePreset);
   const blurStrengthRef = useRef(blurStrength);
+  const frameThicknessRef = useRef(frameThickness);
   const isBlurredRef = useRef(isBlurred);
   const vibrancyRef = useRef(vibrancy);
   const blendModeRef = useRef(blendMode);
@@ -395,6 +398,7 @@ function App() {
   activeShaderRef.current = activeShader;
   activePresetRef.current = activePreset;
   blurStrengthRef.current = blurStrength;
+  frameThicknessRef.current = frameThickness;
   isBlurredRef.current = isBlurred;
   vibrancyRef.current = vibrancy;
   blendModeRef.current = blendMode;
@@ -475,6 +479,7 @@ function App() {
       colors: locks.colors ? colorsRef.current : undefined,
       blurStrength: locks.blurStrength ? blurStrengthRef.current : undefined,
       isBlurred: locks.blurStrength ? isBlurredRef.current : undefined,
+      frameThickness: locks.frameThickness ? frameThicknessRef.current : undefined,
       blendMode: locks.blendMode ? blendModeRef.current : undefined,
       activeShader: locks.shader ? activeShaderRef.current : undefined,
       activePreset: locks.shader ? activePresetRef.current : undefined,
@@ -488,6 +493,7 @@ function App() {
     setVibrancy(randomVibrancy);
     setBlendMode(nextConfig.blendMode);
     setShowRing(nextConfig.showRing);
+    setFrameThickness(nextConfig.frameThickness);
     setActiveShader(nextConfig.activeShader);
     setActivePreset(nextConfig.activePreset);
   }, []);
@@ -686,6 +692,7 @@ function App() {
       blurStrength,
       blendMode,
       showRing,
+      frameThickness,
       activeShader,
       activePreset,
       presetParams: preset?.params ?? {},
@@ -766,6 +773,7 @@ function App() {
               blurStrength={blurStrength}
               blendMode={blendMode}
               showRing={showRing}
+              frameThickness={frameThickness}
               width={activeRatio.width}
               height={activeRatio.height}
             />
@@ -819,6 +827,23 @@ function App() {
           checked={showRing}
           onChange={setShowRing}
         />
+
+        {showRing && (
+          <div className="control-group">
+            <div className="slider-header">
+              <LockableLabel locked={!!lockedParams.frameThickness} onToggle={() => toggleParamLock('frameThickness')}>
+                Frame Thickness
+              </LockableLabel>
+              <span className="slider-value">{frameThickness}%</span>
+            </div>
+            <TakiSlider
+              value={frameThickness}
+              min={LIMITS.minFrameThickness}
+              max={LIMITS.maxFrameThickness}
+              onChange={setFrameThickness}
+            />
+          </div>
+        )}
 
         <div className="control-group">
           <div className="slider-header">
@@ -982,6 +1007,7 @@ function App() {
                 zoom={zoom}
                 containerHeight={previewFitHeight}
                 showRing={showRing}
+                frameThickness={frameThickness}
                 previewMaxDimension={
                   isBlurScrubbing
                     ? BLUR_SCRUB_PREVIEW_MAX_DIMENSION

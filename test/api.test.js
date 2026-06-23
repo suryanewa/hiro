@@ -103,6 +103,26 @@ test('randomizes frame visibility unless explicitly provided', () => {
   assert.equal(createConfigWithFrameRandom(0, { showRing: true }).showRing, true);
 });
 
+test('randomizes frame thickness between 4 and 18 inclusive', () => {
+  const createConfigWithThicknessRandom = (thicknessRandom) => {
+    const randomValues = [0, 0.5, thicknessRandom];
+    return createRandomGradientConfig({
+      random: () => randomValues.shift() ?? thicknessRandom,
+      colors: ['#0f172a', '#3b82f6'],
+      count: 2,
+      vibrancy: 'normal',
+      ratio: '16:9',
+      includeShader: false,
+      rendererSeed: 0.5,
+      blurStrength: 55,
+      blendMode: 'source-over',
+    });
+  };
+
+  assert.equal(createConfigWithThicknessRandom(0).frameThickness, 4);
+  assert.equal(createConfigWithThicknessRandom(0.999).frameThickness, 18);
+});
+
 test('rejects invalid random generation options', () => {
   let error;
   assert.throws(() => {
@@ -149,6 +169,13 @@ test('validates and normalizes gradient configs', () => {
   const invalid = normalizeGradientConfig({ colors: ['nope'], width: 0, blendMode: 'bad' });
   assert.equal(invalid.valid, false);
   assert.ok(invalid.errors.length >= 3);
+
+  const frame = createGradientConfig({ frameThickness: 24 });
+  assert.equal(frame.frameThickness, 24);
+
+  const invalidFrame = normalizeGradientConfig({ frameThickness: 100 });
+  assert.equal(invalidFrame.valid, false);
+  assert.ok(invalidFrame.errors.some((error) => error.field === 'frameThickness'));
 });
 
 test('renders gradients as SVG and creates standalone HTML', () => {
@@ -181,6 +208,19 @@ test('renders SVG blur filters and blend modes for richer configs', () => {
   assert.match(svg, /<filter id="hiro-blur-/);
   assert.match(svg, /<feGaussianBlur/);
   assert.match(svg, /mix-blend-mode:screen/);
+});
+
+test('renders frame thickness into SVG stroke width', () => {
+  const svg = renderGradientAsSvg({
+    colors: ['#0f172a', '#3b82f6'],
+    width: 320,
+    height: 180,
+    seed: 0.5,
+    showRing: true,
+    frameThickness: 20,
+  });
+
+  assert.match(svg, /stroke-width="36"/);
 });
 
 test('renders deterministic but seed-distinct layered SVG geometry', () => {
@@ -285,6 +325,8 @@ test('OpenAPI spec mirrors runtime metadata', () => {
   assert.deepEqual(randomInput.vibrancy.enum, metadata.vibrancy.map((option) => option.value));
   assert.equal(gradientInput.colors.minItems, metadata.limits.minColors);
   assert.equal(gradientInput.colors.maxItems, metadata.limits.maxColors);
+  assert.equal(gradientInput.frameThickness.minimum, metadata.limits.minFrameThickness);
+  assert.equal(gradientInput.frameThickness.maximum, metadata.limits.maxFrameThickness);
   assert.equal(randomInput.previousColors.maxItems, metadata.limits.maxColors);
   assert.equal(randomInput.maxAttempts.minimum, 1);
   assert.equal(randomInput.maxAttempts.maximum, 12);

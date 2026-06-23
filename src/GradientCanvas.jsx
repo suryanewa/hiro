@@ -20,6 +20,7 @@ const GradientCanvas = forwardRef(({
   zoom = 1,
   containerHeight,
   showRing,
+  frameThickness = 12,
   previewMaxDimension = null,
   coalesceRenders = false,
   captureForShader = true,
@@ -46,6 +47,7 @@ const GradientCanvas = forwardRef(({
     blurStrength,
     blendMode,
     showRing,
+    frameThickness,
   };
 
   useImperativeHandle(ref, () => ({
@@ -65,6 +67,7 @@ const GradientCanvas = forwardRef(({
       blurStrength,
       blendMode,
       showRing,
+      frameThickness,
     };
 
     const generation = renderGeneration;
@@ -137,6 +140,7 @@ const GradientCanvas = forwardRef(({
     blendMode,
     onRender,
     showRing,
+    frameThickness,
     renderGeneration,
   ]);
 

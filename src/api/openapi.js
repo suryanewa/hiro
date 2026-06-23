@@ -190,6 +190,11 @@ export function buildOpenApiSpec({ baseUrl = 'http://localhost:8787' } = {}) {
               enum: [...CANVAS_BLEND_MODES],
             },
             showRing: { type: 'boolean' },
+            frameThickness: {
+              type: 'number',
+              minimum: LIMITS.minFrameThickness,
+              maximum: LIMITS.maxFrameThickness,
+            },
             activeShader: {
               type: 'string',
               enum: [...SHADER_VALUES],

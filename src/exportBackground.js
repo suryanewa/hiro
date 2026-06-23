@@ -95,6 +95,7 @@ export function exportBackground({
   blurStrength,
   blendMode,
   showRing,
+  frameThickness,
   activeShader,
   activePreset,
   presetParams,
@@ -122,6 +123,7 @@ export function exportBackground({
         blurStrength,
         blendMode,
         showRing,
+        frameThickness,
       });
     }
 
@@ -146,6 +148,7 @@ export function exportBackground({
       blurStrength,
       blendMode,
       showRing,
+      frameThickness,
       activeShader,
       activePreset,
       pngFilename,
@@ -178,6 +181,7 @@ export function exportBackground({
           blurStrength,
           blendMode,
           showRing,
+          frameThickness,
           activeShader,
           activePreset,
           presetParams: presetParams || {},

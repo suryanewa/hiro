@@ -46,6 +46,7 @@ export const DEFAULT_GRADIENT_CONFIG = Object.freeze({
   blurStrength: 100,
   blendMode: 'source-over',
   showRing: false,
+  frameThickness: 12,
   activeShader: 'none',
   activePreset: '',
   presetParams: {},
@@ -58,4 +59,6 @@ export const LIMITS = Object.freeze({
   maxDimension: 8192,
   minBlurStrength: 0,
   maxBlurStrength: 100,
+  minFrameThickness: 2,
+  maxFrameThickness: 24,
 });

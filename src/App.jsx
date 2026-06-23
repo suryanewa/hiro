@@ -811,6 +811,41 @@ function App() {
             checked={vividOnly}
             onChange={setVividOnly}
           />
+          <AnimatedSelect
+            label={(
+              <LockableLabel locked={!!lockedParams.vibrancy} onToggle={() => toggleParamLock('vibrancy')}>
+                Vibrancy
+              </LockableLabel>
+            )}
+            value={vibrancy}
+            options={VIBRANCY_OPTIONS}
+            onChange={(val) => {
+              setVibrancy(val);
+              setColors(prevColors => (
+                vividOnlyRef.current
+                  ? generateVividPalette(prevColors.length, val, Math.random, prevColors)
+                  : generateDifferentPalette(prevColors.length, val, prevColors)
+              ));
+            }}
+          />
+
+          <AnimatedSelect
+            label={(
+              <LockableLabel locked={!!lockedParams.paletteMood} onToggle={() => toggleParamLock('paletteMood')}>
+                Mood
+              </LockableLabel>
+            )}
+            value={paletteMood}
+            options={PALETTE_MOOD_OPTIONS}
+            onChange={(val) => {
+              setPaletteMood(val);
+              setColors(prevColors => (
+                vividOnlyRef.current
+                  ? generateVividPalette(prevColors.length, vibrancyRef.current, Math.random, prevColors, undefined, val)
+                  : generateDifferentPalette(prevColors.length, vibrancyRef.current, prevColors, undefined, Math.random, val)
+              ));
+            }}
+          />
           <div className="control-header">
             <LockableLabel locked={!!lockedParams.colors} onToggle={() => toggleParamLock('colors')}>
               Colors
@@ -895,42 +930,6 @@ function App() {
             }}
           />
         </div>
-
-        <AnimatedSelect
-          label={(
-            <LockableLabel locked={!!lockedParams.vibrancy} onToggle={() => toggleParamLock('vibrancy')}>
-              Vibrancy
-            </LockableLabel>
-          )}
-          value={vibrancy}
-          options={VIBRANCY_OPTIONS}
-          onChange={(val) => {
-            setVibrancy(val);
-            setColors(prevColors => (
-              vividOnlyRef.current
-                ? generateVividPalette(prevColors.length, val, Math.random, prevColors)
-                : generateDifferentPalette(prevColors.length, val, prevColors)
-            ));
-          }}
-        />
-
-        <AnimatedSelect
-          label={(
-            <LockableLabel locked={!!lockedParams.paletteMood} onToggle={() => toggleParamLock('paletteMood')}>
-              Mood
-            </LockableLabel>
-          )}
-          value={paletteMood}
-          options={PALETTE_MOOD_OPTIONS}
-          onChange={(val) => {
-            setPaletteMood(val);
-            setColors(prevColors => (
-              vividOnlyRef.current
-                ? generateVividPalette(prevColors.length, vibrancyRef.current, Math.random, prevColors, undefined, val)
-                : generateDifferentPalette(prevColors.length, vibrancyRef.current, prevColors, undefined, Math.random, val)
-            ));
-          }}
-        />
 
         <AnimatedSelect
           label={(
